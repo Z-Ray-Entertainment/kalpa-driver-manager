@@ -28,7 +28,7 @@ enroll_mok(){
 # Scanns all PCI devices for vendor nvidia
 # If nvidia devices found checks if it is of type GPU
 # If it is a nvidia GPU check if it is supported accrording to the support matrix
-find_gpu_and_supported_driver(){
+detect_nvidia_gpu_and_supported_driver(){
     for device in $PCI_DEVICE_PATH*; do
         vendor_id=$(cat ${device}/vendor)
         if [ $vendor_id == $NVIDIA_VENDOR_ID ]; then
@@ -73,7 +73,7 @@ analyze_system(){
     #   Has SecureBoot enabled: Yes - Add this script with --mok to autostart to enroll MOK on next system start, inform user
     #   Has SecureBoot enabled: No - Skip MOK enrollment
     detect_kdialog
-    find_gpu_and_supported_driver
+    detect_nvidia_gpu_and_supported_driver
 }
 
 user_consent(){
