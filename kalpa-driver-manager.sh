@@ -13,8 +13,7 @@ user_agreed_to_license=false
 is_secure_boot_enabled=true
 is_distro_supported=false
 
-current_install_step=0
-
+packages_nvidia_repo="openSUSE-repos-MicroOS-NVIDIA"
 packages_g06_closed="nvidia-driver-G06-kmp-meta nvidia-common-G06 nvidia-compute-G06 nvidia-compute-utils-G06 nvidia-gl-G06 nvidia-driver-G06-kmp-default nvidia-video-G06"
 packages_g06_open="nvidia-open-driver-G06-signed-kmp-meta nvidia-common-G06 nvidia-compute-G06 nvidia-compute-utils-G06 nvidia-gl-G06 nvidia-open-driver-G06-signed-kmp-default nvidia-video-G06"
 
@@ -162,24 +161,19 @@ setup_transactional_update(){
     kdesu -c "mkdir -p /etc/transactional-update.conf.d && touch \"$TU_CONFIG_FILE\" && echo \"ZYPPER_AUTO_IMPORT_KEYS=1\" > \"$TU_CONFIG_FILE\""
 }
 
-setup_nvidia_repo(){
-    echo "Setup nvidia repo..."
-    sleep 1
-}
-
 setup_g06_open_driver(){
-    echo "Setup driver G06 Open..."
-    sleep 1
+    kdesu -c "transactional-update -n pkg in $packages_nvidia_repo && transactional-update -n -c pkg in $packages_g06_open"
 }
 
 setup_g06_closed_driver(){
-    echo "Setup driver G06 Open..."
-    sleep 1
+    kdesu -c "transactional-update -n pkg in $packages_nvidia_repo && transactional-update -n -c pkg in $packages_g06_closed"
 }
 
 do_install(){
     if kdialog --title "$TITLE" --yesno "Kalpa will install driver series $supported_driver_series for your device:\n$found_nvidia_device_name ($found_nvidia_device)"; then
-        dbusRef=`kdialog --title "TITLE" --progressbar "Setup Kalpa Desktop, please stand by ..." 4`
+        current_install_step=0
+
+        dbusRef=`kdialog --title "TITLE" --progressbar "Setup Kalpa Desktop, please stand by ..." 3`
         qdbus6 $dbusRef showCancelButton false
 
 
@@ -190,11 +184,6 @@ do_install(){
 
         qdbus6 $dbusRef setLabelText "Configure transactional-update..."
         setup_transactional_update
-        ((current_install_step++))
-        qdbus6 $dbusRef Set "" value $current_install_step
-
-        qdbus6 $dbusRef setLabelText "Setup NVIDIA driver repository..."
-        setup_nvidia_repo
         ((current_install_step++))
         qdbus6 $dbusRef Set "" value $current_install_step
 
