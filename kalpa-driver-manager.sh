@@ -131,9 +131,34 @@ user_consent(){
     fi
 }
 
+setup_zypper(){
+    echo "Setup zypper..."
+}
+
+setup_transactional_update(){
+    echo "Setup transactional-update..."
+}
+
+setup_g06_open_driver(){
+    echo "Setup driver G06 Open..."
+}
+
+setup_g06_closed_driver(){
+    echo "Setup driver G06 Open..."
+}
+
 do_install(){
     if kdialog --title "$TITLE" --yesno "Kalpa will install driver series $supported_driver_series for your device:\n$found_nvidia_device_name ($found_nvidia_device)"; then
-        echo "Do install.."
+        setup_zypper
+        setup_transactional_update
+        case $supported_driver_series in
+            "G06-closed")
+                setup_g06_closed_driver
+            ;;
+            "G06-open")
+                setup_g06_open_driver
+            ;;
+        esac
     fi
 }
 
