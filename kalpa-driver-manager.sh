@@ -86,6 +86,15 @@ detect_kdialog(){
 
 }
 
+detect_transactional_update(){
+    if command -v /usr/sbin/transactional-update >/dev/null 2>&1; then
+        has_transactional_update=true
+    else
+        kdialog --title "$TITLE" --sorry "This systems seems not to be a transactional-updated enabled system. Using this tool is only supported on Kalpa Desktop."
+        exit 1
+    fi
+}
+
 analyze_system(){
     # Is Kalpa Desktop and / or MicroOS: No - Inform user, then Quit
     # Has NVIDIA GPU: No - Inform user, then Quit
@@ -94,6 +103,7 @@ analyze_system(){
     #   Has SecureBoot enabled: Yes - Add this script with --mok to autostart to enroll MOK on next system start, inform user
     #   Has SecureBoot enabled: No - Skip MOK enrollment
     detect_kdialog
+    detect_transactional_update
     detect_secureboot_state
     detect_nvidia_gpu_and_supported_driver
 }
