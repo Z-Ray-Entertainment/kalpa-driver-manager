@@ -51,6 +51,20 @@ find_gpu_and_supported_driver(){
     done
 }
 
+detect_kdialog(){
+    if command -v kdialog >/dev/null 2>&1; then
+        has_kdialog=true
+    else
+        if command -v zenity >/dev/null 2>&1; then
+            zenity --error --title "$TITLE" --text "This tool is to be used on Kalpa Desktop. You probably are running Aeon Desktop which is not supported by this utility"
+        else
+            echo "No supported dialog software found. Exiting"
+        fi
+        exit 1
+    fi
+
+}
+
 analyze_system(){
     # Is Kalpa Dekstop and / or MicroOS: No - Inform user, then Quit
     # Has nVidia GPU: No - Infomr user, then Quit
@@ -58,6 +72,7 @@ analyze_system(){
     # Is nvidia GPU supported by open kernel module: No - Check SecureBoot
     #   Has SecureBoot enabled: Yes - Add this script with --mok to autostart to enroll MOK on next system start, inform user
     #   Has SecureBoot enabled: No - Skip MOK enrollment
+    detect_kdialog
     find_gpu_and_supported_driver
 }
 
