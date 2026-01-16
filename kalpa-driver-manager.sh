@@ -9,6 +9,7 @@ supported_driver_series="none"
 found_nvidia_device="none"
 found_nvidia_device_name=""
 user_agreed_to_license=false
+is_secure_boot_enabled=true
 
 packages_g06_closed="nvidia-driver-G06-kmp-meta nvidia-common-G06 nvidia-compute-G06 nvidia-compute-utils-G06 nvidia-gl-G06 nvidia-driver-G06-kmp-default nvidia-video-G06"
 packages_g06_open="nvidia-open-driver-G06-signed-kmp-meta nvidia-common-G06 nvidia-compute-G06 nvidia-compute-utils-G06 nvidia-gl-G06 nvidia-open-driver-G06-signed-kmp-default nvidia-video-G06"
@@ -63,6 +64,14 @@ detect_nvidia_gpu_and_supported_driver(){
     done
 }
 
+detect_secureboot_state(){
+    while IFS= read -r line ; do
+        if [ "$line" == "SecureBoot disabled" ]; then
+            is_secure_boot_enabled=false
+        fi
+    done < <(mokutil --sb-state)
+}
+
 detect_kdialog(){
     if command -v kdialog >/dev/null 2>&1; then
         has_kdialog=true
@@ -85,6 +94,7 @@ analyze_system(){
     #   Has SecureBoot enabled: Yes - Add this script with --mok to autostart to enroll MOK on next system start, inform user
     #   Has SecureBoot enabled: No - Skip MOK enrollment
     detect_kdialog
+    detect_secureboot_state
     detect_nvidia_gpu_and_supported_driver
 }
 
@@ -124,6 +134,10 @@ main(){
     else
         user_consent
         if [ $user_agreed_to_license = true ]; then
+            if [ $is_secure_boot_enabled = true ] && [ $supported_driver_series == "G06-closed" ]; then
+                kdialog --title "$TITLE" --sorry "Setting up the nvidia driver on SecureBoot enabled system with the closed source driver is currently not supported."
+                exit 1
+            fi
             case $supported_driver_series in
                 "G00"|"G04"|"G05")
                     kdialog --title "$TITLE" --sorry "Kalpa detected an NVIDIA GPU (Device ID: $found_nvidia_device) but it is not considered to deliver a good experience. If you believe this to be a mistake please check your graphics card at: https://www.nvidia.com/en-us/drivers/. If the minimum supported driver series is 500 or newer please report this issue to Kalpa Desktop."
