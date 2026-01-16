@@ -29,12 +29,12 @@ declare -A GPU_SUPPORT_MATRIX=(
 )
 
 enroll_mok(){
-    echo "MOK enrolement not implemented yet"
+    echo "MOK enrollment not implemented yet"
 }
 
-# Scanns all PCI devices for vendor nvidia
-# If nvidia devices found checks if it is of type GPU
-# If it is a nvidia GPU check if it is supported accrording to the support matrix
+# Scans all PCI devices for vendor NVIDIA
+# If NVIDIA devices found checks if it is of type GPU
+# If it is a NVIDIA GPU check if it is supported according to the support matrix
 detect_nvidia_gpu_and_supported_driver(){
     for device in $PCI_DEVICE_PATH*; do
         vendor_id=$(cat ${device}/vendor)
@@ -73,10 +73,10 @@ detect_kdialog(){
 }
 
 analyze_system(){
-    # Is Kalpa Dekstop and / or MicroOS: No - Inform user, then Quit
-    # Has nVidia GPU: No - Infomr user, then Quit
-    # Has supported nVidia GPU: No - Inform user, then Quit
-    # Is nvidia GPU supported by open kernel module: No - Check SecureBoot
+    # Is Kalpa Desktop and / or MicroOS: No - Inform user, then Quit
+    # Has NVIDIA GPU: No - Inform user, then Quit
+    # Has supported NVIDIA GPU: No - Inform user, then Quit
+    # Is NVIDIA GPU supported by open kernel module: No - Check SecureBoot
     #   Has SecureBoot enabled: Yes - Add this script with --mok to autostart to enroll MOK on next system start, inform user
     #   Has SecureBoot enabled: No - Skip MOK enrollment
     detect_kdialog
@@ -84,7 +84,7 @@ analyze_system(){
 }
 
 user_consent(){
-    kdialog --title "$TITLE" --msgbox "This tool will setup and install the propriatary nVidia driver. This driver is not developed by Kalpa and using it is on your own risk.\n\nBy continuing you agree to the NVIDIA Driver License Agreement to be found here: https://www.nvidia.com/en-us/drivers/nvidia-license/linux/"
+    kdialog --title "$TITLE" --msgbox "This tool will setup and install the proprietary NVIDIA driver. This driver is not developed by Kalpa and using it is on your own risk.\n\nBy continuing you agree to the NVIDIA Driver License Agreement to be found here: https://www.nvidia.com/en-us/drivers/nvidia-license/linux/"
 
     if kdialog --title "$TITLE" --yesno "Do you accept the NVIDIA Driver License Agreement?"; then
         user_agreed_to_license=true
@@ -121,7 +121,7 @@ main(){
         if [ $user_agreed_to_license = true ]; then
             case $supported_driver_series in
                 "G00"|"G04"|"G05")
-                    kdialog --title "$TITLE" --sorry "Kalpa detected an NVIDIA GPU (Device ID: $found_nvidia_device) but it is not considered to deliver a good experience. If you believe this to be a mistake please check your graphics card at: https://www.nvidia.com/en-us/drivers/. If the minimum suported driver series is 500 or newer please report this issue to Kalpa Desktop."
+                    kdialog --title "$TITLE" --sorry "Kalpa detected an NVIDIA GPU (Device ID: $found_nvidia_device) but it is not considered to deliver a good experience. If you believe this to be a mistake please check your graphics card at: https://www.nvidia.com/en-us/drivers/. If the minimum supported driver series is 500 or newer please report this issue to Kalpa Desktop."
                 ;;
                 "none")
                     if kdialog --title "$TITLE" --yesno "Kalpa detected a NVIDIA GPU (Device ID: $found_nvidia_device) but couldn't match it with any supported driver series. We will try to install the latest driver. Do you want to continue?"; then
