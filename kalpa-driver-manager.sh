@@ -7,7 +7,7 @@ PCI_DEVICE_PATH="/sys/bus/pci/devices/"
 
 supported_driver_series="none"
 found_nvidia_device="none"
-found_nvidia_gpu_but_device_id_does_not_match_support_matrix=false
+found_nvidia_device_name=""
 user_agreed_to_license=false
 
 #G0: Unsupproted
@@ -32,6 +32,12 @@ enroll_mok(){
     echo "MOK enrollment not implemented yet"
 }
 
+read_nvidia_device_name(){
+    stripped_device_id=${found_nvidia_device:2:5}
+    stripped_vendor_id=${NVIDIA_VENDOR_ID:2:5}
+    found_nvidia_device_name=$(lspci -d "$stripped_vendor_id:$stripped_device_id")
+}
+
 # Scans all PCI devices for vendor NVIDIA
 # If NVIDIA devices found checks if it is of type GPU
 # If it is a NVIDIA GPU check if it is supported according to the support matrix
@@ -43,6 +49,7 @@ detect_nvidia_gpu_and_supported_driver(){
             for nvidia_gpu_class in ${NVIDIA_GPU_CLASSES[@]}; do
                 if [ $device_class == $nvidia_gpu_class ]; then
                     found_nvidia_device=$(cat ${device}/device)
+                    read_nvidia_device_name
                     for driver_series in ${!GPU_SUPPORT_MATRIX[@]}; do
                         IFS=";" read -r -a supported_gpus_by_driver <<< "${GPU_SUPPORT_MATRIX[$driver_series]}"
                         for gpu_id in ${supported_gpus_by_driver[@]}; do
@@ -92,7 +99,7 @@ user_consent(){
 }
 
 do_install(){
-    if kdialog --title "$TITLE" --yesno "Kalpa will install driver series $supported_driver_series for your device $found_nvidia_device"; then
+    if kdialog --title "$TITLE" --yesno "Kalpa will install driver series $supported_driver_series for your device:\n$found_nvidia_device_name ($found_nvidia_device)"; then
         echo "Do install.."
     fi
 }
