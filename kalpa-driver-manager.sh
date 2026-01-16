@@ -40,8 +40,8 @@ read_nvidia_device_name(){
 }
 
 # Scans all PCI devices for vendor NVIDIA
-# If NVIDIA devices found checks if it is of type GPU
-# If it is a NVIDIA GPU check if it is supported according to the support matrix
+# If NVIDIA devices found checks if they are of type GPU
+# If there are NVIDIA GPUs check if they are supported by any known driver as defined in the GPU_SUPPORT_MATRIX
 detect_nvidia_gpu_and_supported_driver(){
     for device in $PCI_DEVICE_PATH*; do
         vendor_id=$(cat ${device}/vendor)
