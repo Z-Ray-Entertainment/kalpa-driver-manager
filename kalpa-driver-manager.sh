@@ -154,8 +154,7 @@ user_consent(){
 }
 
 setup_zypper(){
-    echo "Setup zypper..."
-    sleep 1
+    kdesu -c "sed -i 's/# autoAgreeWithLicenses = no/autoAgreeWithLicenses = yes/' \"/etc/zypp/zypper.conf\""
 }
 
 setup_transactional_update(){
