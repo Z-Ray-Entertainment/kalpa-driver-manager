@@ -92,6 +92,7 @@ read_commandline(){
     for i in "$@"; do
         case $i in
             -m*|--mok*)
+            analyze_system
             enroll_mok
             ;;
             *)
