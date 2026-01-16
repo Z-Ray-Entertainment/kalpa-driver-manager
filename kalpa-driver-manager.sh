@@ -104,6 +104,15 @@ detect_transactional_update(){
     fi
 }
 
+detect_kdesu(){
+    if command -v kdesu >/dev/null 2>&1; then
+        has_kdesu=true
+    else
+        kdialog --title "$TITLE" --sorry "This systems seems to lack kdesu. This utility is only supported on Kalpa Desktop."
+        exit 1
+    fi
+}
+
 analyze_system(){
     # Is Kalpa Desktop and / or MicroOS: No - Inform user, then Quit
     # Has NVIDIA GPU: No - Inform user, then Quit
@@ -113,6 +122,7 @@ analyze_system(){
     #   Has SecureBoot enabled: No - Skip MOK enrollment
     detect_kdialog
     detect_transactional_update
+    detect_kdesu
     detect_distribution
     detect_secureboot_state
     detect_nvidia_gpu_and_supported_driver
