@@ -10,6 +10,7 @@ found_nvidia_device="none"
 found_nvidia_device_name=""
 user_agreed_to_license=false
 is_secure_boot_enabled=true
+is_distro_supported=false
 
 packages_g06_closed="nvidia-driver-G06-kmp-meta nvidia-common-G06 nvidia-compute-G06 nvidia-compute-utils-G06 nvidia-gl-G06 nvidia-driver-G06-kmp-default nvidia-video-G06"
 packages_g06_open="nvidia-open-driver-G06-signed-kmp-meta nvidia-common-G06 nvidia-compute-G06 nvidia-compute-utils-G06 nvidia-gl-G06 nvidia-open-driver-G06-signed-kmp-default nvidia-video-G06"
@@ -86,6 +87,14 @@ detect_kdialog(){
 
 }
 
+detect_distribution(){
+    while IFS= read -r line ; do
+        if [ "$line" == "ID=\"kalpa-desktop\"" ] || [ "$line" == "ID=\"opensuse-microos\"" ]; then
+            is_distro_supported=true
+        fi
+    done < <(cat /etc/os-release)
+}
+
 detect_transactional_update(){
     if command -v /usr/sbin/transactional-update >/dev/null 2>&1; then
         has_transactional_update=true
@@ -104,6 +113,7 @@ analyze_system(){
     #   Has SecureBoot enabled: No - Skip MOK enrollment
     detect_kdialog
     detect_transactional_update
+    detect_distribution
     detect_secureboot_state
     detect_nvidia_gpu_and_supported_driver
 }
@@ -147,22 +157,27 @@ main(){
     if [ $found_nvidia_device == "none" ]; then
         kdialog --title "$TITLE" --sorry "Kalpa was unable to detect any NVIDIA graphics device in this computer."
     else
-        user_consent
-        if [ $user_agreed_to_license = true ]; then
-            case $supported_driver_series in
-                "G00"|"G04"|"G05")
-                    kdialog --title "$TITLE" --sorry "Kalpa detected an NVIDIA GPU (Device ID: $found_nvidia_device) but it is not considered to deliver a good experience. If you believe this to be a mistake please check your graphics card at: https://www.nvidia.com/en-us/drivers/. If the minimum supported driver series is 500 or newer please report this issue to Kalpa Desktop."
-                ;;
-                "none")
-                    if kdialog --title "$TITLE" --yesno "Kalpa detected a NVIDIA GPU (Device ID: $found_nvidia_device) but couldn't match it with any supported driver series. We will try to install the latest driver. Do you want to continue?"; then
-                        supported_driver_series="G06-open"
+        if [ $is_distro_supported = true ]; then
+            user_consent
+            if [ $user_agreed_to_license = true ]; then
+                case $supported_driver_series in
+                    "G00"|"G04"|"G05")
+                        kdialog --title "$TITLE" --sorry "Kalpa detected an NVIDIA GPU (Device ID: $found_nvidia_device) but it is not considered to deliver a good experience. If you believe this to be a mistake please check your graphics card at: https://www.nvidia.com/en-us/drivers/. If the minimum supported driver series is 500 or newer please report this issue to Kalpa Desktop."
+                    ;;
+                    "none")
+                        if kdialog --title "$TITLE" --yesno "Kalpa detected a NVIDIA GPU (Device ID: $found_nvidia_device) but couldn't match it with any supported driver series. We will try to install the latest driver. Do you want to continue?"; then
+                            supported_driver_series="G06-open"
+                            do_install
+                        fi
+                    ;;
+                    *)
                         do_install
-                    fi
-                ;;
-                *)
-                    do_install
-                ;;
-            esac
+                    ;;
+                esac
+            fi
+        else
+            kdialog --title "$TITLE" --sorry "You seem not to run Kalpa Desktop. This utility does not work on other distributions"
+            exit 1
         fi
     fi
 }
