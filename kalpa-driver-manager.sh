@@ -155,7 +155,7 @@ main(){
     analyze_system
 
     if [ $found_nvidia_device == "none" ]; then
-        kdialog --title "$TITLE" --sorry "Kalpa was unable to detect any NVIDIA graphics device in this computer."
+        kdialog --title "$TITLE" --sorry "Kalpa was unable to detect any NVIDIA graphics device in this system. Installing NVIDIA drivers is not required."
     else
         if [ $is_distro_supported = true ]; then
             user_consent
