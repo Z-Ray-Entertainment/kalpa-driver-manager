@@ -4,6 +4,7 @@ TITLE="Kalpa Driver Manager"
 NVIDIA_VENDOR_ID="0x10de"
 NVIDIA_GPU_CLASSES=("0x030000" "0x030200") # "desktop_gpu" "mobile_gpu"
 PCI_DEVICE_PATH="/sys/bus/pci/devices/"
+TU_CONFIG_FILE="/etc/transactional-update.conf.d/40-import-key.conf"
 
 supported_driver_series="none"
 found_nvidia_device="none"
@@ -158,8 +159,7 @@ setup_zypper(){
 }
 
 setup_transactional_update(){
-    echo "Setup transactional-update..."
-    sleep 1
+    kdesu -c "mkdir -p /etc/transactional-update.conf.d && touch \"$TU_CONFIG_FILE\" && echo \"ZYPPER_AUTO_IMPORT_KEYS=1\" > \"$TU_CONFIG_FILE\""
 }
 
 setup_nvidia_repo(){
