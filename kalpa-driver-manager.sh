@@ -56,7 +56,7 @@ detect_kdialog(){
         has_kdialog=true
     else
         if command -v zenity >/dev/null 2>&1; then
-            zenity --error --title "$TITLE" --text "This tool is to be used on Kalpa Desktop. You probably are running Aeon Desktop which is not supported by this utility"
+            zenity --error --title "$TITLE" --text "KDialog not found. This tool is to be used on Kalpa Desktop. You probably are running Aeon Desktop which is not supported by this utility"
         else
             echo "No supported dialog software found. Exiting"
         fi
