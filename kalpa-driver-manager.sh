@@ -119,7 +119,7 @@ analyze_system(){
 }
 
 user_consent(){
-    kdialog --title "$TITLE" --msgbox "This tool will setup and install the proprietary NVIDIA driver. This driver is not developed by Kalpa and using it is on your own risk.\n\nBy continuing you agree to the NVIDIA Driver License Agreement to be found here: https://www.nvidia.com/en-us/drivers/nvidia-license/linux/"
+    kdialog --title "$TITLE" --msgbox "This tool will setup and install the proprietary NVIDIA driver. The driver is not developed by Kalpa, using it is on your own risk.\n\nAny driver specific errors are to be reported directly to NVIDIA.\n\nBy continuing you agree to the NVIDIA Driver License Agreement which can be found here: https://www.nvidia.com/en-us/drivers/nvidia-license/linux/"
 
     if [ $is_secure_boot_enabled = true ] && [ $supported_driver_series == "G06-closed" ]; then
         kdialog --title "$TITLE" --sorry "Setting up the nvidia driver on SecureBoot enabled system with the closed source driver is currently not supported."
