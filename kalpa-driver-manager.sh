@@ -51,7 +51,6 @@ detect_nvidia_gpu_and_supported_driver(){
                         for gpu_id in ${supported_gpus_by_driver[@]}; do
                             if [ $gpu_id == $found_nvidia_device ]; then
                                 supported_driver_series=$driver_series
-                                echo "Found supported driver series: $supported_driver_series for device $found_nvidia_device"
                             fi
                         done
                     done
