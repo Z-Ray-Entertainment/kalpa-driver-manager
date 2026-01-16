@@ -101,6 +101,11 @@ analyze_system(){
 user_consent(){
     kdialog --title "$TITLE" --msgbox "This tool will setup and install the proprietary NVIDIA driver. This driver is not developed by Kalpa and using it is on your own risk.\n\nBy continuing you agree to the NVIDIA Driver License Agreement to be found here: https://www.nvidia.com/en-us/drivers/nvidia-license/linux/"
 
+    if [ $is_secure_boot_enabled = true ] && [ $supported_driver_series == "G06-closed" ]; then
+        kdialog --title "$TITLE" --sorry "Setting up the nvidia driver on SecureBoot enabled system with the closed source driver is currently not supported."
+        exit 1
+    fi
+
     if kdialog --title "$TITLE" --yesno "Do you accept the NVIDIA Driver License Agreement?"; then
         user_agreed_to_license=true
     fi
@@ -134,10 +139,6 @@ main(){
     else
         user_consent
         if [ $user_agreed_to_license = true ]; then
-            if [ $is_secure_boot_enabled = true ] && [ $supported_driver_series == "G06-closed" ]; then
-                kdialog --title "$TITLE" --sorry "Setting up the nvidia driver on SecureBoot enabled system with the closed source driver is currently not supported."
-                exit 1
-            fi
             case $supported_driver_series in
                 "G00"|"G04"|"G05")
                     kdialog --title "$TITLE" --sorry "Kalpa detected an NVIDIA GPU (Device ID: $found_nvidia_device) but it is not considered to deliver a good experience. If you believe this to be a mistake please check your graphics card at: https://www.nvidia.com/en-us/drivers/. If the minimum supported driver series is 500 or newer please report this issue to Kalpa Desktop."
