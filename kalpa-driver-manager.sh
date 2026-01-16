@@ -113,6 +113,15 @@ detect_kdesu(){
     fi
 }
 
+detect_sed(){
+    if command -v sed >/dev/null 2>&1; then
+        has_sed=true
+    else
+        kdialog --title "$TITLE" --sorry "This systems seems to lack sed. This utility is only supported on Kalpa Desktop."
+        exit 1
+    fi
+}
+
 analyze_system(){
     # Is Kalpa Desktop and / or MicroOS: No - Inform user, then Quit
     # Has NVIDIA GPU: No - Inform user, then Quit
@@ -123,6 +132,7 @@ analyze_system(){
     detect_kdialog
     detect_transactional_update
     detect_kdesu
+    detect_sed
     detect_distribution
     detect_secureboot_state
     detect_nvidia_gpu_and_supported_driver
