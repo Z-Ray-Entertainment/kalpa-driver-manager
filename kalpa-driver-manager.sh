@@ -154,7 +154,7 @@ setup_zypper(){
 }
 
 setup_transactional_update(){
-    kdesu -c "mkdir -p /etc/transactional-update.conf.d && touch \"$TU_CONFIG_FILE\" && echo \"ZYPPER_AUTO_IMPORT_KEYS=1\" > \"$TU_CONFIG_FILE\""
+    kdesu -c "echo \"ZYPPER_AUTO_IMPORT_KEYS=1\" > \"/etc/transactional-update.conf\""
 }
 
 setup_g06_open_driver(){
