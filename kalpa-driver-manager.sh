@@ -29,7 +29,11 @@ declare -A GPU_SUPPORT_MATRIX=(
 )
 
 enroll_mok(){
-    echo "MOK enrollment not implemented yet"
+    kdesu -c "for der_file in /usr/share/nvidia-pubkeys/*.der; do mokutil --import \${der_file} --password 1234 ; done"
+    enroll_mok_returned=$?
+    if [ $enroll_mok_returned == 0 ]; then
+        kdialog --title "$TITLE" --msgbox "MOKs have been enrolled. After restarting your computer your UEFI will prompt you with a dialog called 'Perform MOK management' here choose 'Enroll MOK', 'Continue', 'Yes' and enter '1234' as password. After wards the NVIDIA driver should be loaded.\n\nAfter every NVIDIA driver update you have to repeated this process. Simply launch 'kalpa-driver-manager --mok' to run though this dialog again."
+    fi
 }
 
 read_nvidia_device_name(){
@@ -170,7 +174,7 @@ do_install_nvidia_drivers(){
     if kdialog --title "$TITLE" --yesno "Kalpa will install driver series $supported_driver_series for your device:\n$found_nvidia_device_name ($found_nvidia_device)"; then
         current_install_step=0
 
-        dbusRef=`kdialog --title "TITLE" --progressbar "Setup Kalpa Desktop, please stand by ..." 3`
+        dbusRef=`kdialog --title "$TITLE" --progressbar "Setup Kalpa Desktop, please stand by ..." 3`
         qdbus6 $dbusRef showCancelButton false
 
 
@@ -188,9 +192,11 @@ do_install_nvidia_drivers(){
         case $supported_driver_series in
             "G06-closed")
                 setup_g06_closed_driver
+                install_returned=$?
             ;;
             "G06-open")
                 setup_g06_open_driver
+                install_returned=$?
             ;;
         esac
         ((current_install_step++))
@@ -198,7 +204,15 @@ do_install_nvidia_drivers(){
 
         qdbus6 $dbusRef close
 
-        kdialog --title="$TITLE" --msgbox "Installation successful, please reboot your computer any time for the driver to load up."
+        if [ $install_returned == 0 ]; then
+            if [ $is_secure_boot_enabled = true ] && [ $supported_driver_series == "G06-closed" ]; then
+                kdialog --title="$TITLE" --msgbox "Driver installation successful. However we detected SecureBoot is enabled while also installing the closed source NVIDIA Kernel module. In order for the driver to actual function we have to enroll the required SecureBoot signing keys for the driver. After rebooting $TITLE will open up and guide your through the process."
+            else
+                kdialog --title="$TITLE" --msgbox "Installation successful, please reboot your computer any time for the driver to load up."
+            fi
+        else
+            kdialog --title="$TITLE" --sorry "There seemed to be an error during the driver installation. Please submit this error to Kalpa Desktop and attache this log file to the report $LOG_FILE"
+        fi
     fi
 }
 
@@ -207,7 +221,17 @@ read_commandline(){
         case $i in
             -m*|--mok*)
             analyze_system
-            enroll_mok
+            if [ $is_secure_boot_enabled = true ]; then
+                if [ $supported_driver_series == "G06-closed" ]; then
+                    if kdialog --title "$TITLE" --yesno "Welcome to the MOK enroll assistant. By continuing we will modify your systems SecureBoot setup by adding the NVIDIA provided signing Key to the UEFI keystore. Do you wish to continue?"; then
+                        enroll_mok
+                    fi
+                else
+                    kdialog --title "$TITLE" --msgbox "Enrolling signing keys is not required on this system. Your GPU is supported by the open source NVIDIA kernel module which do not require the enrollment of singing keys."
+                fi
+            else
+                kdialog --title "$TITLE" --msgbox "Enrolling signing keys is not required on this system. SecureBoot is disabled"
+            fi
             ;;
             *)
                     # Unknonw option
@@ -227,7 +251,7 @@ main(){
             if [ $user_agreed_to_license = true ]; then
                 case $supported_driver_series in
                     "G00"|"G04"|"G05")
-                        kdialog --title "$TITLE" --sorry "Kalpa detected an NVIDIA GPU (Device ID: $found_nvidia_device) but it is not considered to deliver a good experience. If you believe this to be a mistake please check your graphics card at: https://www.nvidia.com/en-us/drivers/. If the minimum supported driver series is 500 or newer please report this issue to Kalpa Desktop."
+                        kdialog --title "$TITLE" --sorry "Kalpa detected a NVIDIA GPU (Device ID: $found_nvidia_device) but it is not considered to deliver a good experience. If you believe this to be a mistake please check your graphics card at: https://www.nvidia.com/en-us/drivers/. If the minimum supported driver series is 500 or newer please report this issue to Kalpa Desktop."
                     ;;
                     "none")
                         if kdialog --title "$TITLE" --yesno "Kalpa detected a NVIDIA GPU (Device ID: $found_nvidia_device) but couldn't match it with any supported driver series. We will try to install the latest driver. Do you want to continue?"; then
