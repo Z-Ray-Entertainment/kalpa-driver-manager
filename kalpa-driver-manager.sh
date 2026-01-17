@@ -29,7 +29,7 @@ declare -A GPU_SUPPORT_MATRIX=(
 )
 
 enroll_mok(){
-    kdesu -c "for der_file in /usr/share/nvidia-pubkeys/*.der; do mokutil --import \${der_file} --password 1234 ; done"
+    kdesu -t -c "for der_file in /usr/share/nvidia-pubkeys/*; do if [[ -f \"\$der_file\" ]]; then echo \"Enrolling: \${der_file}\" && mokutil -i \"\$der_file\" -p 1234 ; fi ; done" >> "$LOG_FILE"
     enroll_mok_returned=$?
     if [ $enroll_mok_returned == 0 ]; then
         kdialog --title "$TITLE" --msgbox "MOKs have been enrolled. After restarting your computer your UEFI will prompt you with a dialog called 'Perform MOK management' here choose 'Enroll MOK', 'Continue', 'Yes' and enter '1234' as password. After wards the NVIDIA driver should be loaded.\n\nAfter every NVIDIA driver update you have to repeated this process. Simply launch 'kalpa-driver-manager --mok' to run though this dialog again."
