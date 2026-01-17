@@ -13,10 +13,6 @@ user_agreed_to_license=false
 is_secure_boot_enabled=true
 is_distro_supported=false
 
-packages_nvidia_repo="openSUSE-repos-MicroOS-NVIDIA"
-packages_g06_closed="nvidia-driver-G06-kmp-meta nvidia-common-G06 nvidia-compute-G06 nvidia-compute-utils-G06 nvidia-gl-G06 nvidia-driver-G06-kmp-default nvidia-video-G06"
-packages_g06_open="nvidia-open-driver-G06-signed-kmp-meta nvidia-common-G06 nvidia-compute-G06 nvidia-compute-utils-G06 nvidia-gl-G06 nvidia-open-driver-G06-signed-kmp-default nvidia-video-G06"
-
 declare -A GPU_SUPPORT_MATRIX=(
     # Curie, Tesla 2.0 there are no drivers available
     ["G00"]="0x10c3;0x10c5;0x10d8;0x0ca8;0x0ca9;0x0cac;0x0caf;0x0cb0;0x0cb1;0x0cbc;0x0ca0;0x0ca2;0x0ca3;0x0ca4;0x0ca5;0x0ca7;0x0be2;0x0a75;0x0a76;0x0a78;0x0a7a;0x0a7b;0x0a7c;0x0a6e;0x0a6f;0x0a70;0x0a71;0x0a72;0x0a73;0x0a74;0x0a65;0x0a66;0x0a67;0x0a68;0x0a69;0x0a6a;0x0a6c;0x0a34;0x0a35;0x0a38;0x0a3c;0x0a60;0x0a62;0x0a63;0x0a64;0x0a28;0x0a29;0x0a2a;0x0a2b;0x0a2c;0x0a2d;0x0a30;0x0a32;0x0a20;0x0a21;0x0a22;0x0a23;0x0a26;0x0a27;0x0a24;0x087a;0x087d;0x087e;0x087f;0x086e;0x0870;0x0871;0x0872;0x0873;0x0874;0x0876;0x0866;0x0867;0x0868;0x086a;0x086c;0x086d;0x084d;0x084f;0x0860;0x0861;0x0862;0x86;0x0863;0x0864;0x0865;0x0845;0x0846;0x0847;0x0848;0x0849;0x084a;0x084b;0x084c;0x07e5;0x0840;0x0844;0x07e0;0x07e1;0x07e2;0x07e3"
@@ -162,14 +158,15 @@ setup_transactional_update(){
 }
 
 setup_g06_open_driver(){
-    kdesu -c "transactional-update -n pkg in $packages_nvidia_repo && transactional-update -n -c pkg in $packages_g06_open"
+    kdesu -c "transactional-update -n pkg in openSUSE-repos-MicroOS-NVIDIA && transactional-update -c -n pkg in nvidia-open-driver-G06-signed-kmp-meta && transactional-update -c run version=\$(rpm -qa --queryformat '%{VERSION}\n' nvidia-open-driver-G06-signed-kmp-default | cut -d \"_\" -f1 | sort -u | tail -n 1)
+ && transactional-update -n -c pkg in in nvidia-compute-utils-G06 == \${version} nvidia-persistenced == \${version} nvidia-video-G06 == \${version} && transactional-update -c initrd"
 }
 
 setup_g06_closed_driver(){
-    kdesu -c "transactional-update -n pkg in $packages_nvidia_repo && transactional-update -n -c pkg in $packages_g06_closed"
+    kdesu -c "transactional-update -n pkg in openSUSE-repos-MicroOS-NVIDIA && transactional-update -n -c pkg in nvidia-driver-G06-kmp-meta && transactional-update -c initrd"
 }
 
-do_install(){
+do_install_nvidia_drivers(){
     if kdialog --title "$TITLE" --yesno "Kalpa will install driver series $supported_driver_series for your device:\n$found_nvidia_device_name ($found_nvidia_device)"; then
         current_install_step=0
 
@@ -235,11 +232,11 @@ main(){
                     "none")
                         if kdialog --title "$TITLE" --yesno "Kalpa detected a NVIDIA GPU (Device ID: $found_nvidia_device) but couldn't match it with any supported driver series. We will try to install the latest driver. Do you want to continue?"; then
                             supported_driver_series="G06-open"
-                            do_install
+                            do_install_nvidia_drivers
                         fi
                     ;;
                     *)
-                        do_install
+                        do_install_nvidia_drivers
                     ;;
                 esac
             fi
