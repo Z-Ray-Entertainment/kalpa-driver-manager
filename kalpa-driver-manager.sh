@@ -5,6 +5,7 @@ NVIDIA_VENDOR_ID="0x10de"
 NVIDIA_GPU_CLASSES=("0x030000" "0x030200") # "desktop_gpu" "mobile_gpu"
 PCI_DEVICE_PATH="/sys/bus/pci/devices/"
 TU_CONFIG_FILE="/etc/transactional-update.conf.d/40-import-key.conf"
+LOG_FILE=${HOME}/kalpa-driver-manager.log
 
 supported_driver_series="none"
 found_nvidia_device="none"
@@ -158,11 +159,11 @@ setup_transactional_update(){
 }
 
 setup_g06_open_driver(){
-    kdesu -t -c "transactional-update -n pkg in openSUSE-repos-MicroOS-NVIDIA && transactional-update -c -n pkg in nvidia-open-driver-G06-signed-kmp-meta && transactional-update apply && version=\$(rpm -qa --queryformat '%{VERSION}\n' nvidia-open-driver-G06-signed-kmp-default | cut -d \"_\" -f1 | sort -u | tail -n 1) && transactional-update -n -c pkg in nvidia-compute-utils-G06 == \$version nvidia-persistenced == \$version nvidia-video-G06 == \$version && transactional-update -c initrd"
+    kdesu -t -c "transactional-update -n pkg in openSUSE-repos-MicroOS-NVIDIA && transactional-update -c -n pkg in nvidia-open-driver-G06-signed-kmp-meta && transactional-update apply && version=\$(rpm -qa --queryformat '%{VERSION}\n' nvidia-open-driver-G06-signed-kmp-default | cut -d \"_\" -f1 | sort -u | tail -n 1) && transactional-update -n -c pkg in nvidia-compute-utils-G06 == \$version nvidia-persistenced == \$version nvidia-video-G06 == \$version && transactional-update -c initrd" >> "$LOG_FILE"
 }
 
 setup_g06_closed_driver(){
-    kdesu -c "transactional-update -n pkg in openSUSE-repos-MicroOS-NVIDIA && transactional-update -n -c pkg in nvidia-driver-G06-kmp-meta && transactional-update -c initrd"
+    kdesu -t -c "transactional-update -n pkg in openSUSE-repos-MicroOS-NVIDIA && transactional-update -n -c pkg in nvidia-driver-G06-kmp-meta && transactional-update -c initrd" >> "$LOG_FILE"
 }
 
 do_install_nvidia_drivers(){
