@@ -384,7 +384,7 @@ main(){
             ;;
             "none")
                 if kdialog --title "$TITLE" --yesno "Kalpa detected a NVIDIA GPU (Device ID: $found_nvidia_device) but couldn't match it with any supported driver series. We will try to install the latest driver. Do you want to continue?"; then
-                    supported_driver_series="G06-open"
+                    supported_driver_series="$DRIVER_G06_OPEN"
                     do_install_nvidia_drivers
                 fi
             ;;
