@@ -14,7 +14,7 @@ user_agreed_to_license=false
 
 is_system_valid=false
 
-is_secure_boot_enabled=false
+is_secure_boot_enabled=true
 is_distro_supported=false
 has_kdialog=false
 has_zenity=false
