@@ -11,8 +11,16 @@ supported_driver_series="none"
 found_nvidia_device="none"
 found_nvidia_device_name=""
 user_agreed_to_license=false
-is_secure_boot_enabled=true
+
+is_system_valid=false
+
+is_secure_boot_enabled=false
 is_distro_supported=false
+has_kdialog=false
+has_zenity=false
+has_transactional_update=false
+has_sed=false
+has_qdbus6=false
 
 declare -A GPU_SUPPORT_MATRIX=(
     # Curie, Tesla 2.0 there are no drivers available
@@ -81,13 +89,9 @@ detect_kdialog(){
         has_kdialog=true
     else
         if command -v zenity >/dev/null 2>&1; then
-            zenity --error --title "$TITLE" --text "KDialog not found. This tool is to be used on Kalpa Desktop. You probably are running Aeon Desktop which is not supported by this utility"
-        else
-            echo "No supported dialog software found. Exiting"
+            has_zenity=true
         fi
-        exit 1
     fi
-
 }
 
 detect_distribution(){
@@ -101,28 +105,25 @@ detect_distribution(){
 detect_transactional_update(){
     if command -v /usr/sbin/transactional-update >/dev/null 2>&1; then
         has_transactional_update=true
-    else
-        kdialog --title "$TITLE" --sorry "This systems seems not to be a transactional-updated enabled system. Using this tool is only supported on Kalpa Desktop."
-        exit 1
     fi
 }
 
 detect_kdesu(){
     if command -v kdesu >/dev/null 2>&1; then
         has_kdesu=true
-    else
-        kdialog --title "$TITLE" --sorry "This systems seems to lack kdesu. This utility is only supported on Kalpa Desktop."
-        exit 1
     fi
 }
 
 detect_sed(){
     if command -v sed >/dev/null 2>&1; then
         has_sed=true
-    else
-        kdialog --title "$TITLE" --sorry "This systems seems to lack sed. This utility is only supported on Kalpa Desktop."
-        exit 1
     fi
+}
+
+detect_qdbus6(){
+    if command -v qdbus6 >/dev/null 2>&1; then
+        has_qdbus6=true
+    fi;
 }
 
 analyze_system(){
@@ -136,9 +137,52 @@ analyze_system(){
     detect_transactional_update
     detect_kdesu
     detect_sed
+    detect_qdbus6
     detect_distribution
     detect_secureboot_state
     detect_nvidia_gpu_and_supported_driver
+}
+
+verify_system(){
+    if [ $is_distro_supported = true ]; then
+        if [ $has_kdialog = true ]; then
+            if [ $has_transactional_update = true ]; then
+                if [ $has_sed = true ]; then
+                    if [ $has_qdbus6 = true ]; then
+                        if [ $has_kdesu = true ]; then
+                            if [ $found_nvidia_device != "none" ]; then
+                                is_system_valid=true
+                            else
+                                kdialog --title "$TITLE" --sorry "Kalpa was unable to detect any NVIDIA graphics device in this system. Installing NVIDIA drivers is not required."
+                                exit 1
+                            fi
+                        else
+                            kdialog --title "$TITLE" --sorry "This systems seems to lack kdesu. This utility is only supported on Kalpa Desktop."
+                            exit 1
+                        fi
+                    else
+                        kdialog --title "$TITLE" --sorry "This systems seems to lack qdbus6. This utility is only supported on Kalpa Desktop."
+                        exit 1
+                    fi
+                else
+                    kdialog --title "$TITLE" --sorry "This systems seems to lack sed. This utility is only supported on Kalpa Desktop."
+                    exit 1
+                fi
+            else
+                kdialog --title "$TITLE" --sorry "This systems seems not to be a transactional-updated enabled system. Using this tool is only supported on Kalpa Desktop."
+                exit 1
+            fi
+        elif [ $has_zenity = true ]; then
+            zenity --error --title "$TITLE" --text "KDialog not found. This tool is to be used on Kalpa Desktop. You probably are running Aeon Desktop which is not supported by this utility"
+            exit 1
+        else
+            echo "No supported dialog software found. Exiting"
+            exit 1
+        fi
+    else
+        kdialog --title "$TITLE" --sorry "You seem not to run Kalpa Desktop. This utility does not work on other distributions"
+        exit 1
+    fi
 }
 
 user_consent(){
@@ -221,6 +265,7 @@ read_commandline(){
         case $i in
             -m*|--mok*)
             analyze_system
+            verify_system
             if [ $is_secure_boot_enabled = true ]; then
                 if [ $supported_driver_series == "G06-closed" ]; then
                     if kdialog --title "$TITLE" --yesno "Welcome to the MOK enroll assistant. By continuing we will modify your systems SecureBoot setup by adding the NVIDIA provided signing Key to the UEFI keystore. Do you wish to continue?"; then
@@ -234,7 +279,7 @@ read_commandline(){
             fi
             ;;
             *)
-                    # Unknonw option
+                # Unknonw option
             ;;
         esac
     done
@@ -242,32 +287,24 @@ read_commandline(){
 
 main(){
     analyze_system
+    verify_system
+    user_consent
 
-    if [ $found_nvidia_device == "none" ]; then
-        kdialog --title "$TITLE" --sorry "Kalpa was unable to detect any NVIDIA graphics device in this system. Installing NVIDIA drivers is not required."
-    else
-        if [ $is_distro_supported = true ]; then
-            user_consent
-            if [ $user_agreed_to_license = true ]; then
-                case $supported_driver_series in
-                    "G00"|"G04"|"G05")
-                        kdialog --title "$TITLE" --sorry "Kalpa detected a NVIDIA GPU (Device ID: $found_nvidia_device) but it is not considered to deliver a good experience. If you believe this to be a mistake please check your graphics card at: https://www.nvidia.com/en-us/drivers/. If the minimum supported driver series is 500 or newer please report this issue to Kalpa Desktop."
-                    ;;
-                    "none")
-                        if kdialog --title "$TITLE" --yesno "Kalpa detected a NVIDIA GPU (Device ID: $found_nvidia_device) but couldn't match it with any supported driver series. We will try to install the latest driver. Do you want to continue?"; then
-                            supported_driver_series="G06-open"
-                            do_install_nvidia_drivers
-                        fi
-                    ;;
-                    *)
-                        do_install_nvidia_drivers
-                    ;;
-                esac
-            fi
-        else
-            kdialog --title "$TITLE" --sorry "You seem not to run Kalpa Desktop. This utility does not work on other distributions"
-            exit 1
-        fi
+    if [ $user_agreed_to_license = true ]; then
+        case $supported_driver_series in
+            "G00"|"G04"|"G05")
+                kdialog --title "$TITLE" --sorry "Kalpa detected a NVIDIA GPU (Device ID: $found_nvidia_device) but it is not considered to deliver a good experience. If you believe this to be a mistake please check your graphics card at: https://www.nvidia.com/en-us/drivers/. If the minimum supported driver series is 500 or newer please report this issue to Kalpa Desktop."
+            ;;
+            "none")
+                if kdialog --title "$TITLE" --yesno "Kalpa detected a NVIDIA GPU (Device ID: $found_nvidia_device) but couldn't match it with any supported driver series. We will try to install the latest driver. Do you want to continue?"; then
+                    supported_driver_series="G06-open"
+                    do_install_nvidia_drivers
+                fi
+            ;;
+            *)
+                do_install_nvidia_drivers
+            ;;
+        esac
     fi
 }
 
