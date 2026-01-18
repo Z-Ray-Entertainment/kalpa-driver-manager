@@ -38,7 +38,13 @@ declare -A GPU_SUPPORT_MATRIX=(
 )
 
 enable_mok_autostart(){
-    echo -e "[Desktop Entry]\nExec=/usr/bin/kalpa-driver-manager --mok" > "$AUTOSTART_FILE"
+    echo -e "[Desktop Entry]\nExec=/usr/bin/kalpa-driver-manager --mok\nType=Application" > "$AUTOSTART_FILE"
+}
+
+clear_mok_autostart(){
+    if [[ -f "$AUTOSTART_FILE" ]]; then
+        rm -f "$AUTOSTART_FILE"
+    fi
 }
 
 enroll_mok(){
@@ -46,9 +52,6 @@ enroll_mok(){
     enroll_mok_returned=$?
     if [ $enroll_mok_returned == 0 ]; then
         kdialog --title "$TITLE" --msgbox "MOKs have been enrolled. After restarting your computer the UEFI will show a dialog called 'Perform MOK management'. In here please choose 'Enroll MOK' -> 'Continue' -> 'Yes' and enter '1234' as password. Afterwards the NVIDIA driver should be loaded.\n\nAttention: After every NVIDIA driver update you have to repeated this process. Simply launch 'kalpa-driver-manager --mok', or right-click the Kalpa Driver Manager in start menu and choose MOK management, to run though this dialog again."
-    fi
-    if [[ -f "$AUTOSTART_FILE" ]]; then
-        rm -f "$AUTOSTART_FILE"
     fi
 }
 
@@ -287,6 +290,7 @@ read_commandline(){
             else
                 kdialog --title "$TITLE" --msgbox "Enrolling signing keys is not required on this system. SecureBoot is disabled"
             fi
+            clear_mok_autostart
             ;;
             *)
                 # Unknonw option
