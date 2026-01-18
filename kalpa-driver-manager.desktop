@@ -1,0 +1,13 @@
+[Desktop Entry]
+name=Kalpa Driver Manager
+Comment=Install and manage proprietary device drivers
+Exec=/usr/bin/kalpa-driver-manager
+Icon=distributor-logo
+Terminal=false
+Type=Application
+Categories=System;
+Actions=MOK;
+
+[Desktop Action MOK]
+Name=Manage MOKs
+Exec=/usr/bin/kalpa-driver-manager --mok
