@@ -16,6 +16,8 @@ user_agreed_to_license=false
 
 is_system_valid=false
 
+is_on_ac_power=false
+is_power_saving=false
 is_nvidia_driver_installed=false
 is_secure_boot_enabled=true
 is_distro_supported=false
@@ -73,6 +75,15 @@ read_nvidia_device_name(){
     stripped_device_id=${found_nvidia_device:2:5}
     stripped_vendor_id=${NVIDIA_VENDOR_ID:2:5}
     found_nvidia_device_name=$(lspci -d "$stripped_vendor_id:$stripped_device_id")
+}
+
+detect_power(){
+    if [ systemd-ac-power ]; then
+        is_on_ac_power=true
+    fi
+    if [ $(powerprofilesctl get) == "power-saver" ]; then
+        is_power_saving=true
+    fi
 }
 
 # Scans all PCI devices for vendor NVIDIA
@@ -177,6 +188,7 @@ analyze_system(){
     detect_secureboot_state
     detect_nvidia_gpu_and_supported_driver
     detect_nvidia_driver
+    detect_power
 }
 
 verify_system(){
