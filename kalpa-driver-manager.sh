@@ -14,6 +14,7 @@ user_agreed_to_license=false
 
 is_system_valid=false
 
+is_nvidia_driver_installed=false
 is_secure_boot_enabled=true
 is_distro_supported=false
 has_kdialog=false
@@ -74,6 +75,25 @@ detect_nvidia_gpu_and_supported_driver(){
             done
         fi
     done
+}
+
+detect_nvidia_driver(){
+    nvidia_drm=false
+    nvidia_modeset=false
+    nvidia_uvm=false
+    if [ $(lsmod | grep -om1 nvidia_drm) == "nvidia_drm" ]; then
+        nvidia_drm=true
+    fi
+    if [ $(lsmod | grep -om1 nvidia_modeset) == "nvidia_modeset" ]; then
+        nvidia_modeset=true
+    fi
+    if [ $(lsmod | grep -om1 nvidia_uvm) == "nvidia_uvm" ]; then
+        nvidia_uvm=true
+    fi
+
+    if [ $nvidia_drm = true ] && [ $nvidia_modeset = true ] && [ $nvidia_uvm = true ]; then
+        is_nvidia_driver_installed=true
+    fi
 }
 
 detect_secureboot_state(){
@@ -141,6 +161,7 @@ analyze_system(){
     detect_distribution
     detect_secureboot_state
     detect_nvidia_gpu_and_supported_driver
+    detect_nvidia_driver
 }
 
 verify_system(){
@@ -151,7 +172,12 @@ verify_system(){
                     if [ $has_qdbus6 = true ]; then
                         if [ $has_kdesu = true ]; then
                             if [ $found_nvidia_device != "none" ]; then
-                                is_system_valid=true
+                                if [ $is_nvidia_driver_installed = false ]; then
+                                    is_system_valid=true
+                                else
+                                    kdialog --title "$TITLE" --msgbox "NVIDIA drivers seem to be installed, loaded and running. Installing them is not required."
+                                    exit 1
+                                fi
                             else
                                 kdialog --title "$TITLE" --sorry "Kalpa was unable to detect any NVIDIA graphics device in this system. Installing NVIDIA drivers is not required."
                                 exit 1
