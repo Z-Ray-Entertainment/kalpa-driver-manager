@@ -251,7 +251,7 @@ power_mode_consent(){
     if [ $is_on_ac_power = true ] || [ $is_power_saving = true ]; then
         case $supported_driver_series in
             "$DRIVER_G06_CLOSED")
-                if ! kdialog --title "$TITLE" --yesno "Kalpa detected your system is running on battery or in power saving mode. Installing the propriatary closed source NVIDIA kernel module requires a substential amount of power as the module has to be locally build for the currently running Kernel. It is recommendet connecting the computer to an external power source first. Do you wish to continue anyway?"; then
+                if ! kdialog --title "$TITLE" --yesno "Kalpa detected your system is running on battery or in power saving mode while your GPU requires the closed source NVIDIA kernel modules. Installing these modules requires a substantial amount of energy as they have to be build locally on your machine for the currently running Linux kernel. It is recommended to connect the system to an external power source first or disabling the power save mode to speed up the module compilation. Do you wish to continue anyway?"; then
                     exit 1
                 fi
             ;;
@@ -373,7 +373,7 @@ read_commandline(){
 
 main(){
     analyze_system
-    #verify_system
+    verify_system
     power_mode_consent
     user_consent
 
