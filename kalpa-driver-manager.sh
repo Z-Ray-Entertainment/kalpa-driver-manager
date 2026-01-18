@@ -6,6 +6,7 @@ NVIDIA_GPU_CLASSES=("0x030000" "0x030200") # "desktop_gpu" "mobile_gpu"
 PCI_DEVICE_PATH="/sys/bus/pci/devices/"
 TU_CONFIG_FILE="/etc/transactional-update.conf.d/40-import-key.conf"
 LOG_FILE=${HOME}/kalpa-driver-manager.log
+AUTOSTART_VALIDATE_FILE="$HOME/.config/autostart/kalpa-driver-manager-validate.desktop"
 
 supported_driver_series="none"
 found_nvidia_device="none"
@@ -14,6 +15,7 @@ user_agreed_to_license=false
 
 is_system_valid=false
 
+is_nvidia_driver_installed=false
 is_secure_boot_enabled=true
 is_distro_supported=false
 has_kdialog=false
@@ -36,10 +38,22 @@ declare -A GPU_SUPPORT_MATRIX=(
     ["G07"]="" # Driver not yet in repos. As soon as this is wired up Turing and newer goes here eg. G06-open
 )
 
+enable_validate_autostart(){
+        echo -e "[Desktop Entry]\nExec=/usr/bin/kalpa-driver-manager --validate\nType=Application" > "$AUTOSTART_VALIDATE_FILE"
+}
+
+clear_validate_autostart(){
+    if [[ -f "$AUTOSTART_VALIDATE_FILE" ]]; then
+        rm -f "$AUTOSTART_VALIDATE_FILE"
+    fi
+
+}
+
 enroll_mok(){
     kdesu -t -c "for der_file in /usr/share/nvidia-pubkeys/*; do if [[ -f \"\$der_file\" ]]; then echo \"Enrolling: \${der_file}\" && mokutil -i \"\$der_file\" -p 1234 ; fi ; done" >> "$LOG_FILE"
     enroll_mok_returned=$?
     if [ $enroll_mok_returned == 0 ]; then
+        enable_validate_autostart
         kdialog --title "$TITLE" --msgbox "MOKs have been enrolled. After restarting your computer your UEFI will prompt you with a dialog called 'Perform MOK management' here choose 'Enroll MOK', 'Continue', 'Yes' and enter '1234' as password. Afterwards the NVIDIA driver should be loaded.\n\nAfter every NVIDIA driver update you have to repeated this process. Simply launch 'kalpa-driver-manager --mok' to run though this dialog again."
     fi
 }
@@ -74,6 +88,16 @@ detect_nvidia_gpu_and_supported_driver(){
             done
         fi
     done
+}
+
+detect_nvidia_driver(){
+    if [ $(lsmod | grep -om1 nvidia_drm) == "nvidia_drm" ]; then
+        if [ $(lsmod | grep -om1 nvidia_modeset) == "nvidia_modeset" ]; then
+             if [ $(lsmod | grep -om1 nvidia_uvm) == "nvidia_uvm" ]; then
+                is_nvidia_driver_installed=true
+            fi
+        fi
+    fi
 }
 
 detect_secureboot_state(){
@@ -141,6 +165,7 @@ analyze_system(){
     detect_distribution
     detect_secureboot_state
     detect_nvidia_gpu_and_supported_driver
+    detect_nvidia_driver
 }
 
 verify_system(){
@@ -151,7 +176,12 @@ verify_system(){
                     if [ $has_qdbus6 = true ]; then
                         if [ $has_kdesu = true ]; then
                             if [ $found_nvidia_device != "none" ]; then
-                                is_system_valid=true
+                                if [ $is_nvidia_driver_installed = false ]; then
+                                    is_system_valid=true
+                                else
+                                    kdialog --title "$TITLE" --msgbox "NVIDIA drivers seem to be installed, loaded and running. Installing them is not required."
+                                    exit 1
+                                fi
                             else
                                 kdialog --title "$TITLE" --sorry "Kalpa was unable to detect any NVIDIA graphics device in this system. Installing NVIDIA drivers is not required."
                                 exit 1
@@ -253,6 +283,7 @@ do_install_nvidia_drivers(){
             if [ $is_secure_boot_enabled = true ] && [ $supported_driver_series == "G06-closed" ]; then
                 kdialog --title="$TITLE" --msgbox "Driver installation successful. However we detected SecureBoot is enabled while also installing the closed source NVIDIA Kernel module. In order for the driver to actual function we have to enroll the required SecureBoot signing keys for the driver. After rebooting $TITLE will open up and guide your through the process."
             else
+                enable_validate_autostart
                 kdialog --title="$TITLE" --msgbox "Installation successful, please reboot your computer any time for the driver to load up."
             fi
         else
@@ -278,6 +309,15 @@ read_commandline(){
             else
                 kdialog --title "$TITLE" --msgbox "Enrolling signing keys is not required on this system. SecureBoot is disabled"
             fi
+            ;;
+            --validate*)
+                analyze_system
+                if [ $is_nvidia_driver_installed = true ]; then
+                    clear_validate_autostart
+                else
+                    kdialog --title "$TITLE" --sorry "It seems the NVIDIA drivers couldn't be loaded despite the installation looked to be done successful. Please report this error to Kalpa Desktop and attach $LOG_FILE so we can investigate."
+                    clear_validate_autostart
+                fi
             ;;
             *)
                 # Unknonw option
