@@ -262,11 +262,6 @@ power_mode_consent(){
 user_consent(){
     kdialog --title "$TITLE" --msgbox "This tool will setup and install the proprietary NVIDIA driver.\n➡️ Using this utility comes with absolutely no warranty use it on your own risk.\n➡️ The driver is not developed by Kalpa, using it is on your own risk.\n➡️ Any driver specific errors are to be reported directly to NVIDIA.\n➡️ By continuing you agree to the NVIDIA Driver License Agreement which can be found here: https://www.nvidia.com/en-us/drivers/nvidia-license/linux/"
 
-    if [ $is_secure_boot_enabled = true ] && [ $supported_driver_series == "$DRIVER_G06_CLOSED" ]; then
-        kdialog --title "$TITLE" --sorry "Setting up the nvidia driver on SecureBoot enabled system with the closed source driver is currently not supported."
-        exit 1
-    fi
-
     if kdialog --title "$TITLE" --yesno "Do you accept the NVIDIA Driver License Agreement?"; then
         user_agreed_to_license=true
     fi
