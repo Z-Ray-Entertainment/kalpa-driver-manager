@@ -1,5 +1,5 @@
 [Desktop Entry]
-name=Kalpa Driver Manager
+Name=Kalpa Driver Manager
 Comment=Install and manage proprietary device drivers
 Exec=/usr/bin/kalpa-driver-manager
 Icon=distributor-logo
