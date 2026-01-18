@@ -6,6 +6,7 @@ NVIDIA_GPU_CLASSES=("0x030000" "0x030200") # "desktop_gpu" "mobile_gpu"
 PCI_DEVICE_PATH="/sys/bus/pci/devices/"
 TU_CONFIG_FILE="/etc/transactional-update.conf.d/40-import-key.conf"
 LOG_FILE=${HOME}/kalpa-driver-manager.log
+AUTOSTART_FILE="$HOME/.config/autostart/kalpa-driver-manager-mok.desktop"
 
 supported_driver_series="none"
 found_nvidia_device="none"
@@ -36,11 +37,18 @@ declare -A GPU_SUPPORT_MATRIX=(
     ["G07"]="" # Driver not yet in repos. As soon as this is wired up Turing and newer goes here eg. G06-open
 )
 
+enable_mok_autostart(){
+    echo -e "[Desktop Entry]\nExec=/usr/bin/kalpa-driver-manager --mok" > "$AUTOSTART_FILE"
+}
+
 enroll_mok(){
     kdesu -t -c "for der_file in /usr/share/nvidia-pubkeys/*; do if [[ -f \"\$der_file\" ]]; then echo \"Enrolling: \${der_file}\" && mokutil -i \"\$der_file\" -p 1234 ; fi ; done" >> "$LOG_FILE"
     enroll_mok_returned=$?
     if [ $enroll_mok_returned == 0 ]; then
-        kdialog --title "$TITLE" --msgbox "MOKs have been enrolled. After restarting your computer your UEFI will prompt you with a dialog called 'Perform MOK management' here choose 'Enroll MOK', 'Continue', 'Yes' and enter '1234' as password. Afterwards the NVIDIA driver should be loaded.\n\nAfter every NVIDIA driver update you have to repeated this process. Simply launch 'kalpa-driver-manager --mok', or right-click the Kalpa Driver Manager in start menu and choose MOK management, to run though this dialog again."
+        kdialog --title "$TITLE" --msgbox "MOKs have been enrolled. After restarting your computer the UEFI will show a dialog called 'Perform MOK management'. In here please choose 'Enroll MOK' -> 'Continue' -> 'Yes' and enter '1234' as password. Afterwards the NVIDIA driver should be loaded.\n\nAttention: After every NVIDIA driver update you have to repeated this process. Simply launch 'kalpa-driver-manager --mok', or right-click the Kalpa Driver Manager in start menu and choose MOK management, to run though this dialog again."
+    fi
+    if [[ -f "$AUTOSTART_FILE" ]]; then
+        rm -f "$AUTOSTART_FILE"
     fi
 }
 
@@ -251,7 +259,8 @@ do_install_nvidia_drivers(){
 
         if [ $install_returned == 0 ]; then
             if [ $is_secure_boot_enabled = true ] && [ $supported_driver_series == "G06-closed" ]; then
-                kdialog --title="$TITLE" --msgbox "Driver installation successful. However we detected SecureBoot is enabled while also installing the closed source NVIDIA Kernel module. In order for the driver to actual function we have to enroll the required SecureBoot signing keys for the driver. After rebooting $TITLE will open up and guide your through the process."
+                enable_mok_autostart
+                kdialog --title="$TITLE" --msgbox "Driver installation successful. However we detected SecureBoot is enabled while also installing the closed source NVIDIA Kernel module. In order for the driver to actual function we have to enroll the required SecureBoot signing keys for the driver. After rebooting $TITLE will open up and guide you through the process."
             else
                 kdialog --title="$TITLE" --msgbox "Installation successful, please reboot your computer any time for the driver to load up."
             fi
