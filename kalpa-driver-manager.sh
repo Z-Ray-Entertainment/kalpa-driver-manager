@@ -144,8 +144,8 @@ analyze_system(){
 }
 
 verify_system(){
-    if [ $is_distro_supported = true ]; then
-        if [ $has_kdialog = true ]; then
+    if [ $has_kdialog = true ]; then
+        if [ $is_distro_supported = true ]; then
             if [ $has_transactional_update = true ]; then
                 if [ $has_sed = true ]; then
                     if [ $has_qdbus6 = true ]; then
@@ -172,17 +172,18 @@ verify_system(){
                 kdialog --title "$TITLE" --sorry "This systems seems not to be a transactional-updated enabled system. Using this tool is only supported on Kalpa Desktop."
                 exit 1
             fi
-        elif [ $has_zenity = true ]; then
-            zenity --error --title "$TITLE" --text "KDialog not found. This tool is to be used on Kalpa Desktop. You probably are running Aeon Desktop which is not supported by this utility"
-            exit 1
         else
-            echo "No supported dialog software found. Exiting"
+            kdialog --title "$TITLE" --sorry "You seem not to run Kalpa Desktop. This utility does not work on other distributions"
             exit 1
         fi
+    elif [ $has_zenity = true ]; then
+        zenity --error --title "$TITLE" --text "KDialog not found. This tool is to be used on Kalpa Desktop."
+        exit 1
     else
-        kdialog --title "$TITLE" --sorry "You seem not to run Kalpa Desktop. This utility does not work on other distributions"
+        echo "No supported dialog software found. Exiting"
         exit 1
     fi
+    
 }
 
 user_consent(){
