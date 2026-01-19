@@ -122,9 +122,9 @@ detect_nvidia_gpu_and_supported_driver(){
 }
 
 detect_nvidia_driver(){
-    if [ $(lsmod | grep -om1 nvidia_drm) == "nvidia_drm" ]; then
-        if [ $(lsmod | grep -om1 nvidia_modeset) == "nvidia_modeset" ]; then
-             if [ $(lsmod | grep -om1 nvidia_uvm) == "nvidia_uvm" ]; then
+    if [ $(lsmod | grep -om1 nvidia_drm) ]; then # Return 1 if nothing found
+        if [ $(lsmod | grep -om1 nvidia_modeset) ]; then # Return 1 if nothing found
+             if [ $(lsmod | grep -om1 nvidia_uvm) ]; then # Return 1 if nothing found
                 is_nvidia_driver_installed=true
             fi
         fi
