@@ -316,6 +316,7 @@ do_install_nvidia_drivers(){
         qdbus6 $dbusRef setLabelText "Installing NVIDIA driver..."
         case $supported_driver_series in
             "$DRIVER_G06_CLOSED")
+                qdbus6 $dbusRef setLabelText "Installing NVIDIA driver, this will take some time..."
                 setup_g06_closed_driver
                 install_returned=$?
             ;;
