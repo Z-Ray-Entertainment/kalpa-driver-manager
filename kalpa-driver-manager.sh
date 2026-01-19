@@ -24,7 +24,7 @@ user_agreed_to_license=false
 
 is_system_valid=false
 
-is_on_ac_power=false
+is_on_battery=false
 is_power_saving=false
 is_nvidia_driver_installed=false
 is_secure_boot_enabled=true
@@ -34,6 +34,7 @@ has_zenity=false
 has_transactional_update=false
 has_sed=false
 has_qdbus6=false
+has_mokutils=false
 
 declare -A GPU_SUPPORT_MATRIX=(
     # Curie, Tesla 2.0 there are no drivers available
@@ -86,8 +87,8 @@ read_nvidia_device_name(){
 }
 
 detect_power(){
-    if [ systemd-ac-power ]; then
-        is_on_ac_power=true
+    if [ ! systemd-ac-power ]; then
+        is_on_battery=true
     fi
     if [ $(powerprofilesctl get) == "power-saver" ]; then
         is_power_saving=true
@@ -121,9 +122,9 @@ detect_nvidia_gpu_and_supported_driver(){
 }
 
 detect_nvidia_driver(){
-    if [ $(lsmod | grep -om1 nvidia_drm) == "nvidia_drm" ]; then
-        if [ $(lsmod | grep -om1 nvidia_modeset) == "nvidia_modeset" ]; then
-             if [ $(lsmod | grep -om1 nvidia_uvm) == "nvidia_uvm" ]; then
+    if [ $(lsmod | grep -om1 nvidia_drm) ]; then # Return 1 if nothing found
+        if [ $(lsmod | grep -om1 nvidia_modeset) ]; then # Return 1 if nothing found
+             if [ $(lsmod | grep -om1 nvidia_uvm) ]; then # Return 1 if nothing found
                 is_nvidia_driver_installed=true
             fi
         fi
@@ -131,11 +132,16 @@ detect_nvidia_driver(){
 }
 
 detect_secureboot_state(){
-    while IFS= read -r line ; do
-        if [ "$line" == "SecureBoot disabled" ]; then
-            is_secure_boot_enabled=false
-        fi
-    done < <(mokutil --sb-state)
+    detect_mokutils
+    if [ $has_mokutils = true ]; then
+        while IFS= read -r line ; do
+            if [ "$line" == "SecureBoot disabled" ]; then
+                is_secure_boot_enabled=false
+            fi
+        done < <(mokutil --sb-state)
+    else
+        is_secure_boot_enabled=false
+    fi
 }
 
 detect_kdialog(){
@@ -177,6 +183,12 @@ detect_sed(){
 detect_qdbus6(){
     if command -v qdbus6 >/dev/null 2>&1; then
         has_qdbus6=true
+    fi;
+}
+
+detect_mokutils(){
+    if command -v mokutil >/dev/null 2>&1; then
+        has_mokutils=true
     fi;
 }
 
@@ -248,7 +260,7 @@ verify_system(){
 }
 
 power_mode_consent(){
-    if [ $is_on_ac_power = true ] || [ $is_power_saving = true ]; then
+    if [ $is_on_battery = true ] || [ $is_power_saving = true ]; then
         case $supported_driver_series in
             "$DRIVER_G06_CLOSED")
                 if ! kdialog --title "$TITLE" --yesno "Kalpa detected your system is running on battery or in power saving mode while your GPU requires the closed source NVIDIA kernel modules. Installing these modules requires a substantial amount of energy as they have to be build locally on your machine for the currently running Linux kernel. It is recommended to connect the system to an external power source first or disabling the power save mode to speed up the module compilation. Do you wish to continue anyway?"; then
@@ -304,6 +316,7 @@ do_install_nvidia_drivers(){
         qdbus6 $dbusRef setLabelText "Installing NVIDIA driver..."
         case $supported_driver_series in
             "$DRIVER_G06_CLOSED")
+                qdbus6 $dbusRef setLabelText "Installing NVIDIA driver, this will take some time..."
                 setup_g06_closed_driver
                 install_returned=$?
             ;;
