@@ -7,7 +7,7 @@ PCI_DEVICE_PATH="/sys/bus/pci/devices/"
 TU_CONFIG_FILE="/etc/transactional-update.conf.d/40-import-key.conf"
 LOG_FILE=${HOME}/kalpa-driver-manager.log
 AUTOSTART_FILE="$HOME/.config/autostart/kalpa-driver-manager-mok.desktop"
-AUTOSTART_VALIDATE_FILE="$HOME/.config/autostart/kalpa-driver-manager-validate.desktop"
+AUTOSTART_VALIDATE_NVIDIA_FILE="$HOME/.config/autostart/kalpa-driver-manager-validate.desktop"
 
 NV_DRIVER_G00="G00"
 NV_DRIVER_G04="G04"
@@ -58,21 +58,21 @@ clear_mok_autostart(){
     fi
 }
 
-enable_validate_autostart(){
-        echo -e "[Desktop Entry]\nExec=/usr/bin/kalpa-driver-manager --validate\nType=Application" > "$AUTOSTART_VALIDATE_FILE"
+enable_validate_nvidia_autostart(){
+        echo -e "[Desktop Entry]\nExec=/usr/bin/kalpa-driver-manager --validate-nv\nType=Application" > "$AUTOSTART_VALIDATE_NVIDIA_FILE"
 }
 
-clear_validate_autostart(){
-    if [[ -f "$AUTOSTART_VALIDATE_FILE" ]]; then
-        rm -f "$AUTOSTART_VALIDATE_FILE"
+clear_validate_nvidia_autostart(){
+    if [[ -f "$AUTOSTART_VALIDATE_NVIDIA_FILE" ]]; then
+        rm -f "$AUTOSTART_VALIDATE_NVIDIA_FILE"
     fi
 }
 
-enroll_mok(){
+enroll_nvidia_mok(){
     kdesu -t -c "for der_file in /usr/share/nvidia-pubkeys/*; do if [[ -f \"\$der_file\" ]]; then echo \"Enrolling: \${der_file}\" && mokutil -i \"\$der_file\" -p 1234 ; fi ; done" >> "$LOG_FILE"
-    enroll_mok_returned=$?
-    if [ $enroll_mok_returned == 0 ]; then
-        enable_validate_autostart
+    enroll_nvidia_mok_returned=$?
+    if [ $enroll_nvidia_mok_returned == 0 ]; then
+        enable_validate_nvidia_autostart
         kdialog --title "$TITLE" --msgbox "MOKs have been enrolled. After restarting your computer the UEFI will show a dialog called 'Perform MOK management'. In here please choose 'Enroll MOK' -> 'Continue' -> 'Yes' and enter '1234' as password. Afterwards the NVIDIA driver should be loaded.\n\nAttention: After every NVIDIA driver update you have to repeated this process. Simply launch 'kalpa-driver-manager --mok', or right-click the Kalpa Driver Manager in start menu and choose MOK management, to run though this dialog again."
     fi
 }
@@ -273,7 +273,7 @@ do_install_nvidia_drivers(){
                 enable_mok_autostart
                 kdialog --title="$TITLE" --msgbox "Driver installation successful. However we detected SecureBoot is enabled while also installing the closed source NVIDIA Kernel module. In order for the driver to actual function we have to enroll the required SecureBoot signing keys for the driver. After rebooting $TITLE will open up and guide you through the process."
             else
-                enable_validate_autostart
+                enable_validate_nvidia_autostart
                 kdialog --title="$TITLE" --msgbox "Installation successful, please reboot your computer any time for the driver to load up."
             fi
         else
@@ -291,7 +291,7 @@ read_commandline(){
             if [ $is_secure_boot_enabled = true ]; then
                 if [ $supported_driver_series_nv == "$NV_DRIVER_G06_CLOSED" ]; then
                     if kdialog --title "$TITLE" --yesno "Welcome to the MOK enroll assistant. By continuing we will modify your systems SecureBoot setup by adding the NVIDIA provided signing Key to the UEFI keystore. Do you wish to continue?"; then
-                        enroll_mok
+                        enroll_nvidia_mok
                     fi
                 else
                     kdialog --title "$TITLE" --msgbox "Enrolling signing keys is not required on this system. Your GPU is supported by the open source NVIDIA kernel module which do not require the enrollment of singing keys."
@@ -301,13 +301,13 @@ read_commandline(){
             fi
             clear_mok_autostart
             ;;
-            --validate*)
+            --validate-nv*)
                 analyze_system
                 if detect_nvidia_driver_running; then
-                    clear_validate_autostart
+                    clear_validate_nvidia_autostart
                 else
                     kdialog --title "$TITLE" --sorry "It seems the NVIDIA drivers couldn't be loaded despite the installation looked to be done successful. Please report this error to Kalpa Desktop and attach $LOG_FILE so we can investigate."
-                    clear_validate_autostart
+                    clear_validate_nvidia_autostart
                 fi
             ;;
             *)
