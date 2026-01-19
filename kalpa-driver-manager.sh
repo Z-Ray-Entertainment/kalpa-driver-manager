@@ -31,6 +31,12 @@ declare -A NVIDIA_SUPPORT_MATRIX=(
     ["$NV_DRIVER_G07"]="" # Driver not yet in repos. As soon as this is wired up Turing and newer goes here eg. G06-open
 )
 
+declare -A ROCM_SUPPORT_MATRIX=(
+    ["6_4_0"]=""
+    ["7_1_0"]="" # Not in Repos
+    ["7_1_1"]="" # Not in Repos
+)
+
 supported_driver_series_nv="none"
 found_device_nv="none"
 user_agreed_to_license_nv=false
