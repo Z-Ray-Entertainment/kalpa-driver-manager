@@ -22,19 +22,18 @@ found_nvidia_device="none"
 found_nvidia_device_name=""
 user_agreed_to_license=false
 
-is_system_valid=false
+required_binaries=("kdesu" "kdialog" "qdbus6" "/usr/sbin/transactional-update" "sed")
+missing_binaries=()
+
+is_system_ready_for_rocm=false
+is_system_ready_for_nvidia=false
 
 is_on_battery=false
 is_power_saving=false
 is_nvidia_driver_installed=false
-is_secure_boot_enabled=true
+is_secure_boot_enabled=false
 is_distro_supported=false
-has_kdialog=false
 has_zenity=false
-has_transactional_update=false
-has_sed=false
-has_qdbus6=false
-has_mokutils=false
 
 declare -A GPU_SUPPORT_MATRIX=(
     # Curie, Tesla 2.0 there are no drivers available
@@ -121,10 +120,10 @@ detect_nvidia_gpu_and_supported_driver(){
     done
 }
 
-detect_nvidia_driver(){
-    if [ $(lsmod | grep -om1 nvidia_drm) ]; then # Return 1 if nothing found
-        if [ $(lsmod | grep -om1 nvidia_modeset) ]; then # Return 1 if nothing found
-             if [ $(lsmod | grep -om1 nvidia_uvm) ]; then # Return 1 if nothing found
+detect_nvidia_driver_running(){
+    if [ $(lsmod | grep -om1 nvidia_drm) ]; then
+        if [ $(lsmod | grep -om1 nvidia_modeset) ]; then
+             if [ $(lsmod | grep -om1 nvidia_uvm) ]; then
                 is_nvidia_driver_installed=true
             fi
         fi
@@ -132,25 +131,12 @@ detect_nvidia_driver(){
 }
 
 detect_secureboot_state(){
-    detect_mokutils
-    if [ $has_mokutils = true ]; then
+    if  detect_binary "mokutil"; then
         while IFS= read -r line ; do
-            if [ "$line" == "SecureBoot disabled" ]; then
-                is_secure_boot_enabled=false
+            if [ "$line" == "SecureBoot enabled" ]; then
+                is_secure_boot_enabled=true
             fi
         done < <(mokutil --sb-state)
-    else
-        is_secure_boot_enabled=false
-    fi
-}
-
-detect_kdialog(){
-    if command -v kdialog >/dev/null 2>&1; then
-        has_kdialog=true
-    else
-        if command -v zenity >/dev/null 2>&1; then
-            has_zenity=true
-        fi
     fi
 }
 
@@ -162,101 +148,58 @@ detect_distribution(){
     done < <(cat /etc/os-release)
 }
 
-detect_transactional_update(){
-    if command -v /usr/sbin/transactional-update >/dev/null 2>&1; then
-        has_transactional_update=true
-    fi
+detect_binary(){
+    return $(command -v "$1" >/dev/null 2>&1)
 }
 
-detect_kdesu(){
-    if command -v kdesu >/dev/null 2>&1; then
-        has_kdesu=true
-    fi
-}
-
-detect_sed(){
-    if command -v sed >/dev/null 2>&1; then
-        has_sed=true
-    fi
-}
-
-detect_qdbus6(){
-    if command -v qdbus6 >/dev/null 2>&1; then
-        has_qdbus6=true
-    fi;
-}
-
-detect_mokutils(){
-    if command -v mokutil >/dev/null 2>&1; then
-        has_mokutils=true
-    fi;
+detect_binaries(){
+    for binary in ${required_binaries[@]}; do
+        if ! detect_binary "$binary"; then
+            missing_binaries+=("$binary")
+        fi
+    done
 }
 
 analyze_system(){
-    # Is Kalpa Desktop and / or MicroOS: No - Inform user, then Quit
-    # Has NVIDIA GPU: No - Inform user, then Quit
-    # Has supported NVIDIA GPU: No - Inform user, then Quit
-    # Is NVIDIA GPU supported by open kernel module: No - Check SecureBoot
-    #   Has SecureBoot enabled: Yes - Add this script with --mok to autostart to enroll MOK on next system start, inform user
-    #   Has SecureBoot enabled: No - Skip MOK enrollment
-    detect_kdialog
-    detect_transactional_update
-    detect_kdesu
-    detect_sed
-    detect_qdbus6
+    detect_binaries
     detect_distribution
     detect_secureboot_state
     detect_nvidia_gpu_and_supported_driver
-    detect_nvidia_driver
+    detect_nvidia_driver_running
     detect_power
 }
 
-verify_system(){
-    if [ $has_kdialog = true ]; then
-        if [ $is_distro_supported = true ]; then
-            if [ $has_transactional_update = true ]; then
-                if [ $has_sed = true ]; then
-                    if [ $has_qdbus6 = true ]; then
-                        if [ $has_kdesu = true ]; then
-                            if [ $found_nvidia_device != "none" ]; then
-                                if [ $is_nvidia_driver_installed = false ]; then
-                                    is_system_valid=true
-                                else
-                                    kdialog --title "$TITLE" --msgbox "NVIDIA drivers seem to be installed, loaded and running. Installing them is not required."
-                                    exit 1
-                                fi
-                            else
-                                kdialog --title "$TITLE" --sorry "Kalpa was unable to detect any NVIDIA graphics device in this system. Installing NVIDIA drivers is not required."
-                                exit 1
-                            fi
-                        else
-                            kdialog --title "$TITLE" --sorry "This systems seems to lack kdesu. This utility is only supported on Kalpa Desktop."
-                            exit 1
-                        fi
-                    else
-                        kdialog --title "$TITLE" --sorry "This systems seems to lack qdbus6. This utility is only supported on Kalpa Desktop."
-                        exit 1
-                    fi
-                else
-                    kdialog --title "$TITLE" --sorry "This systems seems to lack sed. This utility is only supported on Kalpa Desktop."
-                    exit 1
-                fi
-            else
-                kdialog --title "$TITLE" --sorry "This systems seems not to be a transactional-updated enabled system. Using this tool is only supported on Kalpa Desktop."
-                exit 1
-            fi
-        else
-            kdialog --title "$TITLE" --sorry "You seem not to run Kalpa Desktop. This utility does not work on other distributions"
-            exit 1
+verify_ready_for_driver(){
+    if [ $found_nvidia_device != "none" ]; then
+        if [ $is_nvidia_driver_installed = false ]; then
+            is_system_ready_for_nvidia=true
         fi
-    elif [ $has_zenity = true ]; then
-        zenity --error --title "$TITLE" --text "KDialog not found. This tool is to be used on Kalpa Desktop."
-        exit 1
-    else
-        echo "No supported dialog software found. Exiting"
+    fi
+
+    if [ $is_system_ready_for_nvidia = false ]; then
+        kdialog --title "$TITLE" --msgbox "All drivers for this system seem to be installed and running."
         exit 1
     fi
-    
+}
+
+verify_system(){
+    if [ ${#missing_binaries[@]} -ne 0 ]; then
+        missing_binaries_string=""
+        for missing_bin in ${missing_binaries}; do
+            missing_binaries_string+="$missing_bin, "
+        done
+        message="We couldn't detect the following binaries: $missing_binaries_string this tool is only t be used on Kalpa Desktop."
+        if detect_binary "kdialog" ; then
+            kdialog --title "$TITLE" --sorry "$message"
+        elif detect_binary "zenity"; then
+            zenity --error --title "$TITLE" --text "$message"
+        else
+            echo "$message"
+        fi
+        exit 1
+    else
+        verify_ready_for_driver
+    fi
 }
 
 power_mode_consent(){
