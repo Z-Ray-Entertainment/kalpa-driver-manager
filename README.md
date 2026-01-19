@@ -22,4 +22,4 @@ KDialog based shell utility to install proprietary devices drivers on Kalpa Desk
 - CPU: AMD Ryzen 7 7800X3D
 - GPU: NVIDIA RTX 3080
 - Boot: UEFI, systemd-boot, SecureBoot on
-- Result: SOFT-FAILED - Installed G06-open, no MOK enrollment was not required for the open kernel module. However KWin was running on llvmpipe while the driver was successfully installed and loaded (according to nvidia-smi). See issue #2
+- Result: SOFT-FAILED - Installed G06-open, MOK enrollment was not required for the open kernel module. However KWin was running on llvmpipe while the driver was successfully installed and loaded (according to nvidia-smi). See issue #2
