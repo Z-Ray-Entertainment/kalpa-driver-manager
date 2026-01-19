@@ -34,6 +34,7 @@ has_zenity=false
 has_transactional_update=false
 has_sed=false
 has_qdbus6=false
+has_mokutils=false
 
 declare -A GPU_SUPPORT_MATRIX=(
     # Curie, Tesla 2.0 there are no drivers available
@@ -131,11 +132,16 @@ detect_nvidia_driver(){
 }
 
 detect_secureboot_state(){
-    while IFS= read -r line ; do
-        if [ "$line" == "SecureBoot disabled" ]; then
-            is_secure_boot_enabled=false
-        fi
-    done < <(mokutil --sb-state)
+    detect_mokutils
+    if [ $has_mokutils = true ]; then
+        while IFS= read -r line ; do
+            if [ "$line" == "SecureBoot disabled" ]; then
+                is_secure_boot_enabled=false
+            fi
+        done < <(mokutil --sb-state)
+    else
+        is_secure_boot_enabled=false
+    fi
 }
 
 detect_kdialog(){
@@ -177,6 +183,12 @@ detect_sed(){
 detect_qdbus6(){
     if command -v qdbus6 >/dev/null 2>&1; then
         has_qdbus6=true
+    fi;
+}
+
+detect_mokutils(){
+    if command -v mokutil >/dev/null 2>&1; then
+        has_mokutils=true
     fi;
 }
 
