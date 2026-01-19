@@ -24,7 +24,7 @@ user_agreed_to_license=false
 
 is_system_valid=false
 
-is_on_ac_power=false
+is_on_battery=false
 is_power_saving=false
 is_nvidia_driver_installed=false
 is_secure_boot_enabled=true
@@ -86,8 +86,8 @@ read_nvidia_device_name(){
 }
 
 detect_power(){
-    if [ systemd-ac-power ]; then
-        is_on_ac_power=true
+    if [ ! systemd-ac-power ]; then
+        is_on_battery=true
     fi
     if [ $(powerprofilesctl get) == "power-saver" ]; then
         is_power_saving=true
@@ -248,7 +248,7 @@ verify_system(){
 }
 
 power_mode_consent(){
-    if [ $is_on_ac_power = true ] || [ $is_power_saving = true ]; then
+    if [ $is_on_battery = true ] || [ $is_power_saving = true ]; then
         case $supported_driver_series in
             "$DRIVER_G06_CLOSED")
                 if ! kdialog --title "$TITLE" --yesno "Kalpa detected your system is running on battery or in power saving mode while your GPU requires the closed source NVIDIA kernel modules. Installing these modules requires a substantial amount of energy as they have to be build locally on your machine for the currently running Linux kernel. It is recommended to connect the system to an external power source first or disabling the power save mode to speed up the module compilation. Do you wish to continue anyway?"; then
