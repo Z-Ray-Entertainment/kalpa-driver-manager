@@ -3,6 +3,16 @@ KDialog based shell utility to install proprietary devices drivers on Kalpa Desk
 
 # THIS SCRIPT IS ALPHA SOFTWARE AND NOT GUARANTEED TO WORK, PLEASE DO NOT USE IT EXCEPT YOU ARE A DEVELOPER
 
+## How it works
+
+Kalpa Driver Manager will analyse the underlying system and evaluate if it is eligable for any drivers supported by utiltiy.
+
+## Supported drivers
+- NVIDIA grapichs drivers (500 series or newer)
+    * Maxwell, Pascal, Volta, Turing, Ampere, Ada Lovelace, Hopper, Blackwell micro architectures. (GTX 9xx, GTX 10, GTX 16, RTX 20, RTX 30, RTX 40, RTX 50) older architectures are detected and not supported. For any unknown NVIDIA GPU it will assume it to be a new GPU not yet known by Kalpa Driver Manager and try to install the latest driver series
+    * Supports enrollment of MOK for SecureBoot systems if the closed source kernel module is required
+    * Validates the installation on the next boot eg. if the required NVIDIA driver modules have been loaded
+
 ## Tested System configurations
 
 ### System A:
