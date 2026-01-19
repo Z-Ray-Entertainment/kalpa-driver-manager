@@ -4,7 +4,6 @@ TITLE="Kalpa Driver Manager"
 NVIDIA_VENDOR_ID="0x10de"
 NVIDIA_GPU_CLASSES=("0x030000" "0x030200") # "desktop_gpu" "mobile_gpu"
 PCI_DEVICE_PATH="/sys/bus/pci/devices/"
-TU_CONFIG_FILE="/etc/transactional-update.conf.d/40-import-key.conf"
 LOG_FILE=${HOME}/kalpa-driver-manager.log
 AUTOSTART_FILE="$HOME/.config/autostart/kalpa-driver-manager-mok.desktop"
 AUTOSTART_VALIDATE_NVIDIA_FILE="$HOME/.config/autostart/kalpa-driver-manager-validate.desktop"
