@@ -16,7 +16,7 @@ NV_DRIVER_G06_CLOSED="G06-closed"
 NV_DRIVER_G06_OPEN="G06-open"
 NV_DRIVER_G07="G07"
 
-NVIDIA_DRIVER_MODULES=("nvidia_drmm" "nvidia_modeset" "nvidia_uvm")
+NVIDIA_DRIVER_MODULES=("nvidia_drm" "nvidia_modeset" "nvidia_uvm")
 
 supported_driver_series="none"
 found_nvidia_device="none"
