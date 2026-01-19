@@ -30,7 +30,6 @@ is_system_ready_for_nvidia=false
 
 is_on_battery=false
 is_power_saving=false
-is_nvidia_driver_installed=false
 is_secure_boot_enabled=false
 is_distro_supported=false
 has_zenity=false
@@ -124,10 +123,11 @@ detect_nvidia_driver_running(){
     if [ $(lsmod | grep -om1 nvidia_drm) ]; then
         if [ $(lsmod | grep -om1 nvidia_modeset) ]; then
              if [ $(lsmod | grep -om1 nvidia_uvm) ]; then
-                is_nvidia_driver_installed=true
+                return 0 #true
             fi
         fi
     fi
+    return 1 #false
 }
 
 detect_secureboot_state(){
@@ -165,13 +165,12 @@ analyze_system(){
     detect_distribution
     detect_secureboot_state
     detect_nvidia_gpu_and_supported_driver
-    detect_nvidia_driver_running
     detect_power
 }
 
 verify_ready_for_driver(){
     if [ $found_nvidia_device != "none" ]; then
-        if [ $is_nvidia_driver_installed = false ]; then
+        if ! detect_nvidia_driver_running; then
             is_system_ready_for_nvidia=true
         fi
     fi
@@ -308,7 +307,7 @@ read_commandline(){
             ;;
             --validate*)
                 analyze_system
-                if [ $is_nvidia_driver_installed = true ]; then
+                if detect_nvidia_driver_running; then
                     clear_validate_autostart
                 else
                     kdialog --title "$TITLE" --sorry "It seems the NVIDIA drivers couldn't be loaded despite the installation looked to be done successful. Please report this error to Kalpa Desktop and attach $LOG_FILE so we can investigate."
