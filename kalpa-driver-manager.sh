@@ -17,9 +17,10 @@ DRIVER_G06_CLOSED="G06-closed"
 DRIVER_G06_OPEN="G06-open"
 DRIVER_G07="G07"
 
+NVIDIA_DRIVER_MODULES=("nvidia_drmm" "nvidia_modeset" "nvidia_uvm")
+
 supported_driver_series="none"
 found_nvidia_device="none"
-found_nvidia_device_name=""
 user_agreed_to_license=false
 
 required_binaries=("kdesu" "kdialog" "qdbus6" "/usr/sbin/transactional-update" "sed")
@@ -81,7 +82,7 @@ enroll_mok(){
 read_nvidia_device_name(){
     stripped_device_id=${found_nvidia_device:2:5}
     stripped_vendor_id=${NVIDIA_VENDOR_ID:2:5}
-    found_nvidia_device_name=$(lspci -d "$stripped_vendor_id:$stripped_device_id")
+    echo "$(lspci -d $stripped_vendor_id:$stripped_device_id)"
 }
 
 detect_power(){
@@ -104,7 +105,6 @@ detect_nvidia_gpu_and_supported_driver(){
             for nvidia_gpu_class in ${NVIDIA_GPU_CLASSES[@]}; do
                 if [ $device_class == $nvidia_gpu_class ]; then
                     found_nvidia_device=$(cat ${device}/device)
-                    read_nvidia_device_name
                     for driver_series in ${!GPU_SUPPORT_MATRIX[@]}; do
                         IFS=";" read -r -a supported_gpus_by_driver <<< "${GPU_SUPPORT_MATRIX[$driver_series]}"
                         for gpu_id in ${supported_gpus_by_driver[@]}; do
@@ -120,14 +120,12 @@ detect_nvidia_gpu_and_supported_driver(){
 }
 
 detect_nvidia_driver_running(){
-    if [ $(lsmod | grep -om1 nvidia_drm) ]; then
-        if [ $(lsmod | grep -om1 nvidia_modeset) ]; then
-             if [ $(lsmod | grep -om1 nvidia_uvm) ]; then
-                return 0 #true
-            fi
+    for module in ${NVIDIA_DRIVER_MODULES[@]}; do
+        if [ ! $(lsmod | grep -om1 $module) ]; then
+            return 1 # false
         fi
-    fi
-    return 1 #false
+    done
+    return 0 # true
 }
 
 detect_secureboot_state(){
@@ -238,7 +236,7 @@ setup_g06_closed_driver(){
 }
 
 do_install_nvidia_drivers(){
-    if kdialog --title "$TITLE" --yesno "Kalpa will install driver series $supported_driver_series for your device:\n$found_nvidia_device_name ($found_nvidia_device)"; then
+    if kdialog --title "$TITLE" --yesno "Kalpa will install driver series $supported_driver_series for your device:\n$(read_nvidia_device_name) ($found_nvidia_device)"; then
         current_install_step=0
 
         dbusRef=`kdialog --title "$TITLE" --progressbar "Setup Kalpa Desktop, please stand by ..." 3`
