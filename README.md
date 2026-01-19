@@ -10,11 +10,13 @@ KDialog based shell utility to install proprietary devices drivers on Kalpa Desk
 - Boot: MBR, GRUB2, SecureBoot off
 - Result: SUCCESS - Installed G06-closed and working
 
+
 - CPU: Intel i5-3230M
 - GPU 0: HD 4000
 - GPU 1: NVIDIA GT 730M
 - BOOT: UEFI, systemd-boot, SecureBoot off
 - Result: FAILED (expected) - Installation denied as GPU required G05 (490 driver series) which was expected. This driver series has limited Wayland support and regularly breaks on newer Kernel releases which in return will break the auto update of Kalpa for an undefined amount of time. Therefore Kepler (and older) GPUs are denied by the driver manager on purpose
+
 
 - CPU: AMD Ryzen 7 7800X3D
 - GPU: NVIDIA RTX 3080
