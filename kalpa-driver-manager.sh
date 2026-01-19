@@ -1,6 +1,7 @@
 #!/usr/bin/bash
 
 TITLE="Kalpa Driver Manager"
+VERSION="0.4.0"
 NVIDIA_VENDOR_ID="0x10de"
 NVIDIA_GPU_CLASSES=("0x030000" "0x030200") # "desktop_gpu" "mobile_gpu"
 PCI_DEVICE_PATH="/sys/bus/pci/devices/"
@@ -358,6 +359,21 @@ read_commandline(){
                     kdialog --title "$TITLE" --sorry "It seems the NVIDIA drivers couldn't be loaded despite the installation looked to be done successful. Please report this error to Kalpa Desktop and attach $LOG_FILE so we can investigate."
                     clear_validate_autostart
                 fi
+            ;;
+            -v|--version*)
+                echo $VERSION
+            ;;
+            -h|--help*)
+                echo "$TITLE usage kalpa-driver-manager [OPTIONS]"
+                echo "Version: $VERSION"
+                echo ""
+                echo "Options:"
+                echo "  -m | --mok      Enrolls machine owner keys (MOK) for SecureBoot enabled systems requiring closed source proprietary kernel modules shipping their own singing keys"
+                echo "  --validate      Validates whether the nvidia driver modules have been loaded or not. Useful to check if the installation of the driver was actually successful"
+                echo "  -v | --version  Prints current version"
+                echo "  -h | --help     Prints this message"
+                echo ""
+                echo "If no options are supplied the manager will walk through the default driver managing process and scans the system for hardware which is known to require additional driver software as well as if required drivers are already installed"
             ;;
             *)
                 # Unknonw option
