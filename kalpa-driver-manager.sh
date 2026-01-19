@@ -18,9 +18,9 @@ NV_DRIVER_G07="G07"
 
 NVIDIA_DRIVER_MODULES=("nvidia_drm" "nvidia_modeset" "nvidia_uvm")
 
-supported_driver_series="none"
-found_nvidia_device="none"
-user_agreed_to_license=false
+supported_driver_series_nv="none"
+found_device_nv="none"
+user_agreed_to_license_nv=false
 
 required_binaries=("kdesu" "kdialog" "qdbus6" "/usr/sbin/transactional-update" "sed")
 missing_binaries=()
@@ -78,7 +78,7 @@ enroll_mok(){
 }
 
 read_nvidia_device_name(){
-    stripped_device_id=${found_nvidia_device:2:5}
+    stripped_device_id=${found_device_nv:2:5}
     stripped_vendor_id=${NVIDIA_VENDOR_ID:2:5}
     echo "$(lspci -d $stripped_vendor_id:$stripped_device_id)"
 }
@@ -102,12 +102,12 @@ detect_nvidia_gpu_and_supported_driver(){
             device_class=$(cat ${device}/class)
             for nvidia_gpu_class in ${NVIDIA_GPU_CLASSES[@]}; do
                 if [ $device_class == $nvidia_gpu_class ]; then
-                    found_nvidia_device=$(cat ${device}/device)
+                    found_device_nv=$(cat ${device}/device)
                     for driver_series in ${!GPU_SUPPORT_MATRIX[@]}; do
                         IFS=";" read -r -a supported_gpus_by_driver <<< "${GPU_SUPPORT_MATRIX[$driver_series]}"
                         for gpu_id in ${supported_gpus_by_driver[@]}; do
-                            if [ $gpu_id == $found_nvidia_device ]; then
-                                supported_driver_series=$driver_series
+                            if [ $gpu_id == $found_device_nv ]; then
+                                supported_driver_series_nv=$driver_series
                             fi
                         done
                     done
@@ -165,7 +165,7 @@ analyze_system(){
 }
 
 verify_ready_for_driver(){
-    if [ $found_nvidia_device != "none" ]; then
+    if [ $found_device_nv != "none" ]; then
         if ! detect_nvidia_driver_running; then
             is_system_ready_for_nvidia=true
         fi
@@ -199,7 +199,7 @@ verify_system(){
 
 power_mode_consent(){
     if [ $is_on_battery = true ] || [ $is_power_saving = true ]; then
-        case $supported_driver_series in
+        case $supported_driver_series_nv in
             "$NV_DRIVER_G06_CLOSED")
                 if ! kdialog --title "$TITLE" --yesno "Kalpa detected your system is running on battery or in power saving mode while your GPU requires the closed source NVIDIA kernel modules. Installing these modules requires a substantial amount of energy as they have to be build locally on your machine for the currently running Linux kernel. It is recommended to connect the system to an external power source first or disabling the power save mode to speed up the module compilation. Do you wish to continue anyway?"; then
                     exit 1
@@ -213,7 +213,7 @@ user_consent(){
     kdialog --title "$TITLE" --msgbox "This tool will setup and install the proprietary NVIDIA driver.\n➡️ Using this utility comes with absolutely no warranty use it on your own risk.\n➡️ The driver is not developed by Kalpa, using it is on your own risk.\n➡️ Any driver specific errors are to be reported directly to NVIDIA.\n➡️ By continuing you agree to the NVIDIA Driver License Agreement which can be found here: https://www.nvidia.com/en-us/drivers/nvidia-license/linux/"
 
     if kdialog --title "$TITLE" --yesno "Do you accept the NVIDIA Driver License Agreement?"; then
-        user_agreed_to_license=true
+        user_agreed_to_license_nv=true
     fi
 }
 
@@ -234,7 +234,7 @@ setup_g06_closed_driver(){
 }
 
 do_install_nvidia_drivers(){
-    if kdialog --title "$TITLE" --yesno "Kalpa will install driver series $supported_driver_series for your device:\n$(read_nvidia_device_name) ($found_nvidia_device)"; then
+    if kdialog --title "$TITLE" --yesno "Kalpa will install driver series $supported_driver_series_nv for your device:\n$(read_nvidia_device_name) ($found_device_nv)"; then
         current_install_step=0
 
         dbusRef=`kdialog --title "$TITLE" --progressbar "Setup Kalpa Desktop, please stand by ..." 3`
@@ -252,7 +252,7 @@ do_install_nvidia_drivers(){
         qdbus6 $dbusRef Set "" value $current_install_step
 
         qdbus6 $dbusRef setLabelText "Installing NVIDIA driver..."
-        case $supported_driver_series in
+        case $supported_driver_series_nv in
             "$NV_DRIVER_G06_CLOSED")
                 qdbus6 $dbusRef setLabelText "Installing NVIDIA driver, this will take some time..."
                 setup_g06_closed_driver
@@ -269,7 +269,7 @@ do_install_nvidia_drivers(){
         qdbus6 $dbusRef close
 
         if [ $install_returned == 0 ]; then
-            if [ $is_secure_boot_enabled = true ] && [ $supported_driver_series == "$NV_DRIVER_G06_CLOSED" ]; then
+            if [ $is_secure_boot_enabled = true ] && [ $supported_driver_series_nv == "$NV_DRIVER_G06_CLOSED" ]; then
                 enable_mok_autostart
                 kdialog --title="$TITLE" --msgbox "Driver installation successful. However we detected SecureBoot is enabled while also installing the closed source NVIDIA Kernel module. In order for the driver to actual function we have to enroll the required SecureBoot signing keys for the driver. After rebooting $TITLE will open up and guide you through the process."
             else
@@ -289,7 +289,7 @@ read_commandline(){
             analyze_system
             verify_system
             if [ $is_secure_boot_enabled = true ]; then
-                if [ $supported_driver_series == "$NV_DRIVER_G06_CLOSED" ]; then
+                if [ $supported_driver_series_nv == "$NV_DRIVER_G06_CLOSED" ]; then
                     if kdialog --title "$TITLE" --yesno "Welcome to the MOK enroll assistant. By continuing we will modify your systems SecureBoot setup by adding the NVIDIA provided signing Key to the UEFI keystore. Do you wish to continue?"; then
                         enroll_mok
                     fi
@@ -323,14 +323,14 @@ main(){
     power_mode_consent
     user_consent
 
-    if [ $user_agreed_to_license = true ]; then
-        case $supported_driver_series in
+    if [ $user_agreed_to_license_nv = true ]; then
+        case $supported_driver_series_nv in
             "$NV_DRIVER_G00"|"$NV_DRIVER_G04"|"$NV_DRIVER_G05")
-                kdialog --title "$TITLE" --sorry "Kalpa detected a NVIDIA GPU (Device ID: $found_nvidia_device) but it is not considered to deliver a good experience. If you believe this to be a mistake please check your graphics card at: https://www.nvidia.com/en-us/drivers/. If the minimum supported driver series is 500 or newer please report this issue to Kalpa Desktop."
+                kdialog --title "$TITLE" --sorry "Kalpa detected a NVIDIA GPU (Device ID: $found_device_nv) but it is not considered to deliver a good experience. If you believe this to be a mistake please check your graphics card at: https://www.nvidia.com/en-us/drivers/. If the minimum supported driver series is 500 or newer please report this issue to Kalpa Desktop."
             ;;
             "none")
-                if kdialog --title "$TITLE" --yesno "Kalpa detected a NVIDIA GPU (Device ID: $found_nvidia_device) but couldn't match it with any supported driver series. We will try to install the latest driver. Do you want to continue?"; then
-                    supported_driver_series="$NV_DRIVER_G06_OPEN"
+                if kdialog --title "$TITLE" --yesno "Kalpa detected a NVIDIA GPU (Device ID: $found_device_nv) but couldn't match it with any supported driver series. We will try to install the latest driver. Do you want to continue?"; then
+                    supported_driver_series_nv="$NV_DRIVER_G06_OPEN"
                     do_install_nvidia_drivers
                 fi
             ;;
