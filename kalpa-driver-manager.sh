@@ -1,8 +1,8 @@
 #!/usr/bin/bash
 
 TITLE="Kalpa Driver Manager"
-NVIDIA_VENDOR_ID="0x10de"
-NVIDIA_GPU_CLASSES=("0x030000" "0x030200") # "desktop_gpu" "mobile_gpu"
+DESKTOP_GPU_CLASS="0x030000"
+MOBILE_GPU_CLASS="0x030200"
 PCI_DEVICE_PATH="/sys/bus/pci/devices/"
 LOG_FILE=${HOME}/kalpa-driver-manager.log
 AUTOSTART_FILE="$HOME/.config/autostart/kalpa-driver-manager-mok.desktop"
@@ -609,8 +609,8 @@ declare -A NVIDIA_SUPPORT_MATRIX=(
     # G07 - not yet in repos, if so all G06-open will go there
 )
 
-supported_driver_series_nv=()
-found_device_nv=()
+supported_driver_series_nv="none"
+found_device_nv="none"
 user_agreed_to_license_nv=false
 
 required_binaries=("kdesu" "kdialog" "qdbus6" "/usr/sbin/transactional-update" "sed")
@@ -655,8 +655,9 @@ enroll_nvidia_mok(){
 }
 
 read_nvidia_device_name(){
-    stripped_device_id=${found_device_nv:2:5}
-    stripped_vendor_id=${NVIDIA_VENDOR_ID:2:5}
+    IFS=":" read -ra vendor_device <<< "$found_device_nv"
+    stripped_vendor_id=${vendor_device[0]:2:5}
+    stripped_device_id=${vendor_device[1]:2:5}
     echo "$(lspci -d $stripped_vendor_id:$stripped_device_id)"
 }
 
@@ -674,22 +675,15 @@ detect_power(){
 # If there are NVIDIA GPUs check if they are supported by any known driver as defined in the NVIDIA_SUPPORT_MATRIX
 detect_nvidia_gpu_and_supported_driver(){
     for device in $PCI_DEVICE_PATH*; do
-        vendor_id=$(cat ${device}/vendor)
-        if [ $vendor_id == $NVIDIA_VENDOR_ID ]; then
-            device_class=$(cat ${device}/class)
-            for nvidia_gpu_class in ${NVIDIA_GPU_CLASSES[@]}; do
-                if [ $device_class == $nvidia_gpu_class ]; then
-                    found_device_nv=$(cat ${device}/device)
-                    for driver_series in ${!NVIDIA_SUPPORT_MATRIX[@]}; do
-                        IFS=";" read -r -a supported_gpus_by_driver <<< "${NVIDIA_SUPPORT_MATRIX[$driver_series]}"
-                        for gpu_id in ${supported_gpus_by_driver[@]}; do
-                            if [ $gpu_id == $found_device_nv ]; then
-                                supported_driver_series_nv=$driver_series
-                            fi
-                        done
-                    done
-                fi
-            done
+        device_class=$(cat ${device}/class)
+        if [ $device_class == $DESKTOP_GPU_CLASS ] || [ $device_class == $MOBILE_GPU_CLASS ]; then
+            vendor_id=$(cat ${device}/vendor)
+            device_id=$(cat ${device}/device)
+            device_key="$vendor_id:$device_id"
+            if [[ -n "${NVIDIA_SUPPORT_MATRIX[$device_key]}" ]]; then
+                found_device_nv="$device_key"
+                supported_driver_series_nv="${NVIDIA_SUPPORT_MATRIX[$device_key]}"
+            fi
         fi
     done
 }
