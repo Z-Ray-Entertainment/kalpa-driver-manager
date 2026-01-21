@@ -8,12 +8,12 @@ LOG_FILE=${HOME}/kalpa-driver-manager.log
 AUTOSTART_FILE="$HOME/.config/autostart/kalpa-driver-manager-mok.desktop"
 AUTOSTART_VALIDATE_NVIDIA_FILE="$HOME/.config/autostart/kalpa-driver-manager-validate.desktop"
 
-NV_DRIVER_G00="G00"
-NV_DRIVER_G04="G04"
-NV_DRIVER_G05="G05"
-NV_DRIVER_G06_CLOSED="G06-closed"
-NV_DRIVER_G06_OPEN="G06-open"
-NV_DRIVER_G07="G07"
+NV_DRIVER_G00="G00" # No driver - denied
+NV_DRIVER_G04="G04" # No Wayland support - denied
+NV_DRIVER_G05="G05" # Limited Wayland support, known to break on Kernel updates - denied 
+NV_DRIVER_G06_CLOSED="G06-closed" # Fully supported
+NV_DRIVER_G06_OPEN="G06-open" # Fully supported
+NV_DRIVER_G07="G07" # Not yet in repos
 
 NVIDIA_DRIVER_MODULES=("nvidia_drm" "nvidia_modeset" "nvidia_uvm")
 declare -A NVIDIA_SUPPORT_MATRIX=(
