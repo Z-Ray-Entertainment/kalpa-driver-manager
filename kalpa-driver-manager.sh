@@ -616,7 +616,6 @@ user_agreed_to_license_nv=false
 required_binaries=("kdesu" "kdialog" "qdbus6" "/usr/sbin/transactional-update" "sed")
 missing_binaries=()
 
-is_system_ready_for_rocm=false
 is_system_ready_for_nvidia=false
 
 is_on_battery=false
