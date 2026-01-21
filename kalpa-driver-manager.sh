@@ -744,6 +744,13 @@ verify_ready_for_driver(){
     if [ $is_system_ready_for_nvidia = false ]; then
         kdialog --title "$TITLE" --msgbox "All drivers for this system seem to be installed and running."
         exit 1
+    else
+        case $supported_driver_series_nv in
+            "$NV_DRIVER_G00"|"$NV_DRIVER_G04"|"$NV_DRIVER_G05")
+                kdialog --title "$TITLE" --sorry "Kalpa detected a NVIDIA GPU:\n\n$(read_nvidia_device_name)\nDevice ID: $found_device_nv\n\nbut is not supported by a recent enough driver and considered to have a bad user experience.\n\nIf you believe this to be a mistake please check your graphics card at:\n\nhttps://www.nvidia.com/en-us/drivers/\n\nIf the minimum supported driver series is 500 or newer, then please report this issue to Kalpa Desktop."
+                exit 1
+            ;;
+        esac
     fi
 }
 
@@ -753,7 +760,7 @@ verify_system(){
         for missing_bin in ${missing_binaries}; do
             missing_binaries_string+="$missing_bin, "
         done
-        message="We couldn't detect the following binaries: $missing_binaries_string this tool is only t be used on Kalpa Desktop."
+        message="We couldn't detect the following binaries: $missing_binaries_string this tool is only to be used on Kalpa Desktop."
         if detect_binary "kdialog" ; then
             kdialog --title "$TITLE" --sorry "$message"
         elif detect_binary "zenity"; then
@@ -894,20 +901,7 @@ main(){
     user_consent
 
     if [ $user_agreed_to_license_nv = true ]; then
-        case $supported_driver_series_nv in
-            "$NV_DRIVER_G00"|"$NV_DRIVER_G04"|"$NV_DRIVER_G05")
-                kdialog --title "$TITLE" --sorry "Kalpa detected a NVIDIA GPU (Device ID: $found_device_nv) but it is not considered to deliver a good experience. If you believe this to be a mistake please check your graphics card at: https://www.nvidia.com/en-us/drivers/. If the minimum supported driver series is 500 or newer please report this issue to Kalpa Desktop."
-            ;;
-            "none")
-                if kdialog --title "$TITLE" --yesno "Kalpa detected a NVIDIA GPU (Device ID: $found_device_nv) but couldn't match it with any supported driver series. We will try to install the latest driver. Do you want to continue?"; then
-                    supported_driver_series_nv="$NV_DRIVER_G06_OPEN"
-                    do_install_nvidia_drivers
-                fi
-            ;;
-            *)
-                do_install_nvidia_drivers
-            ;;
-        esac
+        do_install_nvidia_drivers
     fi
 }
 
