@@ -803,7 +803,7 @@ setup_transactional_update(){
 }
 
 setup_g06_open_driver(){
-    kdesu -t -c "transactional-update -n pkg in openSUSE-repos-MicroOS-NVIDIA && transactional-update -c -n pkg in nvidia-open-driver-G06-signed-kmp-meta && transactional-update -n -c run version=\$(rpm -qa --queryformat '%{VERSION}\n' nvidia-open-driver-G06-signed-kmp-default | cut -d \"_\" -f1 | sort -u | tail -n 1) zypper in nvidia-compute-utils-G06 == \$version nvidia-persistenced == \$version nvidia-video-G06 == \$version && transactional-update -c initrd" >> "$LOG_FILE"
+    kdesu -t -c "transactional-update -n pkg in openSUSE-repos-MicroOS-NVIDIA && transactional-update -c -n pkg in nvidia-open-driver-G06-signed-kmp-meta && transactional-update apply && version=\$(rpm -qa --queryformat '%{VERSION}\n' nvidia-open-driver-G06-signed-kmp-default | cut -d \"_\" -f1 | sort -u | tail -n 1) && transactional-update -n -c pkg in nvidia-compute-utils-G06 == \$version nvidia-persistenced == \$version nvidia-video-G06 == \$version && transactional-update -c initrd" >> "$LOG_FILE"
 }
 
 setup_g06_closed_driver(){
