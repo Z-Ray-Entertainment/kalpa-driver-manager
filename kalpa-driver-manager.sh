@@ -1,7 +1,7 @@
 #!/usr/bin/bash
 
 TITLE="Kalpa Driver Manager"
-VERSION="0.4.0"
+VERSION="develop"
 DESKTOP_GPU_CLASS="0x030000"
 MOBILE_GPU_CLASS="0x030200"
 PCI_DEVICE_PATH="/sys/bus/pci/devices/"
