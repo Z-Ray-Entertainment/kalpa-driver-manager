@@ -23,6 +23,7 @@ Kalpa Driver Manager will analyze the underlying system and evaluate if it is el
 - GPU: NVIDIA GTX 970
 - Boot: MBR, GRUB2, SecureBoot off
 - Result: SUCCESS - Installed G06-closed and working
+- Version: 0.3.1
 
 ### System B:
 - CPU: Intel i5-3230M
@@ -30,9 +31,11 @@ Kalpa Driver Manager will analyze the underlying system and evaluate if it is el
 - GPU 1: NVIDIA GT 730M
 - BOOT: UEFI, systemd-boot, SecureBoot off
 - Result: FAILED (expected) - Installation denied as GPU required G05 (490 driver series) which was expected. This driver series has limited Wayland support and regularly breaks on newer Kernel releases which in return will break the auto update of Kalpa for an undefined amount of time. Therefore Kepler (and older) GPUs are denied by the driver manager on purpose
+- Version: 0.3.1
 
 ### System C:
 - CPU: AMD Ryzen 7 7800X3D
 - GPU: NVIDIA RTX 3080
 - Boot: UEFI, systemd-boot, SecureBoot on
-- Result: SOFT-FAILED - Installed G06-open, MOK enrollment was not required for the open kernel module. However KWin was running on llvmpipe while the driver was successfully installed and loaded (according to nvidia-smi). See issue [#2](https://codeberg.org/vortex_acherontic/kalpa-driver-manager/issues/2)
+- Result: SUCCESS - Installed G06-open and working
+- Version: 0.5.0
