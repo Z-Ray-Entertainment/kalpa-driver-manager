@@ -794,49 +794,41 @@ user_consent(){
     fi
 }
 
-setup_zypper(){
-    kdesu -c "sed -i 's/# autoAgreeWithLicenses = no/autoAgreeWithLicenses = yes/' \"/etc/zypp/zypper.conf\""
+_run_only_in_tu_setup_g06_open_driver(){
+    sed -i 's/# autoAgreeWithLicenses = no/autoAgreeWithLicenses = yes/' /etc/zypp/zypper.conf
+    echo "ZYPPER_AUTO_IMPORT_KEYS=1" > "/etc/transactional-update.conf"
+    zypper -n --gpg-auto-import-keys in --auto-agree-with-licenses openSUSE-repos-MicroOS-NVIDIA
+    zypper -n --gpg-auto-import-keys in --auto-agree-with-licenses nvidia-open-driver-G06-signed-kmp-meta
+    version=$(rpm -qa --queryformat '%{VERSION}\n' nvidia-open-driver-G06-signed-kmp-default | cut -d "_" -f1 | sort -u | tail -n 1)
+    zypper -n --gpg-auto-import-keys in --auto-agree-with-licenses nvidia-compute-utils-G06 == $version nvidia-persistenced == $version nvidia-video-G06 == $version
+    return $?
 }
 
-setup_transactional_update(){
-    kdesu -c "echo \"ZYPPER_AUTO_IMPORT_KEYS=1\" > \"/etc/transactional-update.conf\""
-}
-
-setup_g06_open_driver(){
-    kdesu -t -c "transactional-update -n pkg in openSUSE-repos-MicroOS-NVIDIA && transactional-update -c -n pkg in nvidia-open-driver-G06-signed-kmp-meta && transactional-update apply && version=\$(rpm -qa --queryformat '%{VERSION}\n' nvidia-open-driver-G06-signed-kmp-default | cut -d \"_\" -f1 | sort -u | tail -n 1) && transactional-update -n -c pkg in nvidia-compute-utils-G06 == \$version nvidia-persistenced == \$version nvidia-video-G06 == \$version && transactional-update -c initrd" >> "$LOG_FILE"
-}
-
-setup_g06_closed_driver(){
-    kdesu -t -c "transactional-update -n pkg in openSUSE-repos-MicroOS-NVIDIA && transactional-update -n -c pkg in nvidia-driver-G06-kmp-meta && transactional-update -c initrd" >> "$LOG_FILE"
+_run_only_in_tu_setup_g06_closed_driver(){
+    sed -i 's/# autoAgreeWithLicenses = no/autoAgreeWithLicenses = yes/' /etc/zypp/zypper.conf
+    echo "ZYPPER_AUTO_IMPORT_KEYS=1" > "/etc/transactional-update.conf"
+    zypper -n --gpg-auto-import-keys in --auto-agree-with-licenses openSUSE-repos-MicroOS-NVIDIA
+    zypper -n --gpg-auto-import-keys in --auto-agree-with-licenses nvidia-driver-G06-kmp-meta
+    zypper -n --gpg-auto-import-keys in --auto-agree-with-licenses nvidia-compute-utils-G06 == $version nvidia-persistenced == $version nvidia-video-G06 == $version
+    return $?
 }
 
 do_install_nvidia_drivers(){
     if kdialog --title "$TITLE" --yesno "Kalpa will install driver series $supported_driver_series_nv for your device:\n$(read_nvidia_device_name) ($found_device_nv)"; then
         current_install_step=0
 
-        dbusRef=`kdialog --title "$TITLE" --progressbar "Setup Kalpa Desktop, please stand by ..." 3`
+        dbusRef=`kdialog --title "$TITLE" --progressbar "Setup Kalpa Desktop, please stand by ..." 1`
         qdbus6 $dbusRef showCancelButton false
-
-
-        qdbus6 $dbusRef setLabelText "Configure zypper..."
-        setup_zypper
-        ((current_install_step++))
-        qdbus6 $dbusRef Set "" value $current_install_step
-
-        qdbus6 $dbusRef setLabelText "Configure transactional-update..."
-        setup_transactional_update
-        ((current_install_step++))
-        qdbus6 $dbusRef Set "" value $current_install_step
 
         qdbus6 $dbusRef setLabelText "Installing NVIDIA driver..."
         case $supported_driver_series_nv in
             "$NV_DRIVER_G06_CLOSED")
                 qdbus6 $dbusRef setLabelText "Installing NVIDIA driver, this will take some time..."
-                setup_g06_closed_driver
+                kdesu -t -c "transactional-update run kalpa-driver-manager --install-G06-closed && transactional-update -c initrd" >> "$LOG_FILE"
                 install_returned=$?
             ;;
             "$NV_DRIVER_G06_OPEN")
-                setup_g06_open_driver
+                kdesu -t -c "transactional-update run kalpa-driver-manager --install-G06-open && transactional-update -c initrd" >> "$LOG_FILE"
                 install_returned=$?
             ;;
         esac
@@ -877,6 +869,22 @@ read_commandline(){
                 kdialog --title "$TITLE" --msgbox "Enrolling signing keys is not required on this system. SecureBoot is disabled"
             fi
             clear_mok_autostart
+            ;;
+            --install-G06-open*)
+                _run_only_in_tu_setup_g06_open_driver
+                if [ $? == 0 ]; then
+                    exit 0
+                else
+                    exit 1
+                fi
+            ;;
+            --install-G06-closed*)
+                _run_only_in_tu_setup_g06_closed_driver
+                if [ $? == 0 ]; then
+                    exit 0
+                else
+                    exit 1
+                fi
             ;;
             --validate-nv*)
                 analyze_system
