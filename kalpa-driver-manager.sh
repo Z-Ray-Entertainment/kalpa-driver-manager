@@ -1,6 +1,7 @@
 #!/usr/bin/bash
 
 TITLE="Kalpa Driver Manager"
+VERSION="develop"
 DESKTOP_GPU_CLASS="0x030000"
 MOBILE_GPU_CLASS="0x030200"
 PCI_DEVICE_PATH="/sys/bus/pci/devices/"
@@ -894,6 +895,23 @@ read_commandline(){
                     kdialog --title "$TITLE" --sorry "It seems the NVIDIA drivers couldn't be loaded despite the installation looked to be done successful. Please report this error to Kalpa Desktop and attach $LOG_FILE so we can investigate."
                     clear_validate_nvidia_autostart
                 fi
+            ;;
+            -v|--version*)
+                echo $VERSION
+            ;;
+            -h|--help*)
+                echo "$TITLE usage kalpa-driver-manager [OPTIONS]"
+                echo "Version: $VERSION"
+                echo ""
+                echo "Options:"
+                echo "  -m | --mok              Enrolls machine owner keys (MOK) for SecureBoot enabled systems requiring closed source proprietary kernel modules shipping their own singing keys"
+                echo "  --validate-nv           Validates whether the nvidia driver modules have been loaded or not. Useful to check if the installation of the driver was actually successful"
+                echo "  --install-G06-open      Install the G06 driver using the open source module. It is mandatory to run this cli option with transactional-update otherwise it will fail."
+                echo "  --install-G06-closed    Install the G06 driver using the closed source module. It is mandatory to run this cli option with transactional-update otherwise it will fail."
+                echo "  -v | --version          Prints current version"
+                echo "  -h | --help             Prints this message"
+                echo ""
+                echo "If no options are supplied the manager will walk through the default driver managing process and scans the system for hardware which is known to require additional driver software as well as if required drivers are already installed"
             ;;
             *)
                 # Unknonw option
