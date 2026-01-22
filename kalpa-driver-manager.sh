@@ -8,12 +8,12 @@ LOG_FILE=${HOME}/kalpa-driver-manager.log
 AUTOSTART_FILE="$HOME/.config/autostart/kalpa-driver-manager-mok.desktop"
 AUTOSTART_VALIDATE_NVIDIA_FILE="$HOME/.config/autostart/kalpa-driver-manager-validate.desktop"
 
-NV_DRIVER_G00="G00"
-NV_DRIVER_G04="G04"
-NV_DRIVER_G05="G05"
-NV_DRIVER_G06_CLOSED="G06-closed"
-NV_DRIVER_G06_OPEN="G06-open"
-NV_DRIVER_G07="G07"
+NV_DRIVER_G00="G00" # No driver - denied
+NV_DRIVER_G04="G04" # No Wayland support - denied
+NV_DRIVER_G05="G05" # Limited Wayland support, known to break on Kernel updates - denied 
+NV_DRIVER_G06_CLOSED="G06-closed" # Fully supported
+NV_DRIVER_G06_OPEN="G06-open" # Fully supported
+NV_DRIVER_G07="G07" # Not yet in repos
 
 NVIDIA_DRIVER_MODULES=("nvidia_drm" "nvidia_modeset" "nvidia_uvm")
 declare -A NVIDIA_SUPPORT_MATRIX=(
@@ -616,7 +616,6 @@ user_agreed_to_license_nv=false
 required_binaries=("kdesu" "kdialog" "qdbus6" "/usr/sbin/transactional-update" "sed")
 missing_binaries=()
 
-is_system_ready_for_rocm=false
 is_system_ready_for_nvidia=false
 
 is_on_battery=false
@@ -745,6 +744,13 @@ verify_ready_for_driver(){
     if [ $is_system_ready_for_nvidia = false ]; then
         kdialog --title "$TITLE" --msgbox "All drivers for this system seem to be installed and running."
         exit 1
+    else
+        case $supported_driver_series_nv in
+            "$NV_DRIVER_G00"|"$NV_DRIVER_G04"|"$NV_DRIVER_G05")
+                kdialog --title "$TITLE" --sorry "Kalpa detected a NVIDIA GPU:\n\n$(read_nvidia_device_name)\nDevice ID: $found_device_nv\n\nbut is not supported by a recent enough driver and considered to have a bad user experience.\n\nIf you believe this to be a mistake please check your graphics card at:\n\nhttps://www.nvidia.com/en-us/drivers/\n\nIf the minimum supported driver series is 500 or newer, then please report this issue to Kalpa Desktop."
+                exit 1
+            ;;
+        esac
     fi
 }
 
@@ -754,7 +760,7 @@ verify_system(){
         for missing_bin in ${missing_binaries}; do
             missing_binaries_string+="$missing_bin, "
         done
-        message="We couldn't detect the following binaries: $missing_binaries_string this tool is only t be used on Kalpa Desktop."
+        message="We couldn't detect the following binaries: $missing_binaries_string this tool is only to be used on Kalpa Desktop."
         if detect_binary "kdialog" ; then
             kdialog --title "$TITLE" --sorry "$message"
         elif detect_binary "zenity"; then
@@ -895,20 +901,7 @@ main(){
     user_consent
 
     if [ $user_agreed_to_license_nv = true ]; then
-        case $supported_driver_series_nv in
-            "$NV_DRIVER_G00"|"$NV_DRIVER_G04"|"$NV_DRIVER_G05")
-                kdialog --title "$TITLE" --sorry "Kalpa detected a NVIDIA GPU (Device ID: $found_device_nv) but it is not considered to deliver a good experience. If you believe this to be a mistake please check your graphics card at: https://www.nvidia.com/en-us/drivers/. If the minimum supported driver series is 500 or newer please report this issue to Kalpa Desktop."
-            ;;
-            "none")
-                if kdialog --title "$TITLE" --yesno "Kalpa detected a NVIDIA GPU (Device ID: $found_device_nv) but couldn't match it with any supported driver series. We will try to install the latest driver. Do you want to continue?"; then
-                    supported_driver_series_nv="$NV_DRIVER_G06_OPEN"
-                    do_install_nvidia_drivers
-                fi
-            ;;
-            *)
-                do_install_nvidia_drivers
-            ;;
-        esac
+        do_install_nvidia_drivers
     fi
 }
 
