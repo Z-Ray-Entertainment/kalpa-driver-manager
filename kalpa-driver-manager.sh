@@ -808,7 +808,6 @@ _run_only_in_tu_setup_g06_closed_driver(){
     sed -i 's/# autoAgreeWithLicenses = no/autoAgreeWithLicenses = yes/' /etc/zypp/zypper.conf
     zypper -n --gpg-auto-import-keys in --auto-agree-with-licenses openSUSE-repos-MicroOS-NVIDIA
     zypper -n --gpg-auto-import-keys in --auto-agree-with-licenses nvidia-driver-G06-kmp-meta
-    zypper -n --gpg-auto-import-keys in --auto-agree-with-licenses nvidia-compute-utils-G06 == $version nvidia-persistenced == $version nvidia-video-G06 == $version
     return $?
 }
 
