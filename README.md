@@ -39,3 +39,10 @@ Kalpa Driver Manager will analyze the underlying system and evaluate if it is el
 - Boot: UEFI, systemd-boot, SecureBoot on
 - Result: SUCCESS - Installed G06-open and working
 - Version: 0.5.0
+
+### System D:
+- CPU: AMD Ryzen 7 1800X
+- GPU: NVIDIA GTX 1080
+- Boot: UEFI, systemd-boot, SecureBoot: off
+- Result: FAILED - Installing G06-closed failed due to kalpa-driver-manager bug
+- Version 0.5.0
