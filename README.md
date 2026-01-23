@@ -30,8 +30,8 @@ Kalpa Driver Manager will analyze the underlying system and evaluate if it is el
 - GPU 0: HD 4000
 - GPU 1: NVIDIA GT 730M
 - BOOT: UEFI, systemd-boot, SecureBoot off
-- Result: FAILED (expected) - Installation denied as GPU required G05 (490 driver series) which was expected. This driver series has limited Wayland support and regularly breaks on newer Kernel releases which in return will break the auto update of Kalpa for an undefined amount of time. Therefore Kepler (and older) GPUs are denied by the driver manager on purpose
-- Version: 0.3.1
+- Result: DENIED (expected) - Installation denied as GPU required G05 (470 driver series, officially supported is even only 418.113). This driver series has limited Wayland support and regularly breaks on newer Kernel releases which in return will break the auto update of Kalpa for an undefined amount of time. Therefore Kepler (and older) GPUs are denied by the driver manager on purpose
+- Version: 0.5.1
 
 ### System C:
 - CPU: AMD Ryzen 7 7800X3D
