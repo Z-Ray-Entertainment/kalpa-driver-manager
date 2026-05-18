@@ -625,7 +625,7 @@ is_distro_supported=false
 
 
 askpass_run() {
-  SUDO_ASKPASS=/usr/bin/ksshaskpass sudo -A /bin/sh -lc "$1"
+  SUDO_ASKPASS=/usr/bin/ksshaskpass sudo -A /bin/bash -lc "$1"
 }
 
 enable_mok_autostart(){
@@ -649,7 +649,8 @@ clear_validate_nvidia_autostart(){
 }
 
 enroll_nvidia_mok(){
-    askpass_run "for der_file in /usr/share/nvidia-pubkeys/*; do if [[ -f \"\$der_file\" ]]; then echo \"Enrolling: \${der_file}\" && mokutil -i \"\$der_file\" -p 1234 ; fi ; done" >> "$LOG_FILE"
+    # askpass_run "for der_file in /usr/share/nvidia-pubkeys/*; do if [[ -f \"\$der_file\" ]]; then echo \"Enrolling: \${der_file}\" && mokutil -i \"\$der_file\" -p 1234 ; fi ; done" >> "$LOG_FILE"
+    askpass_run 'for der_file in /usr/share/nvidia-pubkeys/*; do if [[ -f "$der_file" ]]; then echo "Enrolling: $der_file" mokutil -i "$der_file" -p 1234 fi done'
     enroll_nvidia_mok_returned=$?
     if [ $enroll_nvidia_mok_returned == 0 ]; then
         enable_validate_nvidia_autostart
@@ -852,7 +853,7 @@ do_install_nvidia_drivers(){
         if [ $install_returned == 0 ]; then
             if [ $is_secure_boot_enabled = true ] && [ $supported_driver_series_nv == "$NV_DRIVER_G06_CLOSED" ]; then
                 enable_mok_autostart
-                kdialog --title="$TITLE" --msgbox "Driver installation successful. However we detected SecureBoot is enabled while also installing the closed source NVIDIA Kernel module. In order for the driver to actual function we have to enroll the required SecureBoot signing keys for the driver. After rebooting $TITLE will open up and guide you through the process."
+                kdialog --title="$TITLE" --msgbox "Driver installation successful. However we detected SecureBoot is enabled while also installing the closed source NVIDIA Kernel module. In order for the driver to actual function we have to enroll the required SecureBoot signing keys for the driver. After rebooting $TITLE will open up and guide you through the process. Please be aware the next boot will be very unpleasant with low resolution display as the desktop will be rendered entirely on your CPU."
             else
                 enable_validate_nvidia_autostart
                 kdialog --title="$TITLE" --msgbox "Installation successful, please reboot your computer any time for the driver to load up."
