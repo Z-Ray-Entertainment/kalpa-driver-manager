@@ -650,7 +650,7 @@ clear_validate_nvidia_autostart(){
 
 enroll_nvidia_mok(){
     # askpass_run "for der_file in /usr/share/nvidia-pubkeys/*; do if [[ -f \"\$der_file\" ]]; then echo \"Enrolling: \${der_file}\" && mokutil -i \"\$der_file\" -p 1234 ; fi ; done" >> "$LOG_FILE"
-    askpass_run 'for der_file in /usr/share/nvidia-pubkeys/*; do if [[ -f "$der_file" ]]; then echo "Enrolling: $der_file" && mokutil -i "$der_file" -p 1234 ; fi ; done' >> "$LOG_FILE"
+    askpass_run 'for der_file in /usr/share/nvidia-pubkeys/*; do [ -f "$der_file" ] || continue; echo "Enrolling: $der_file"; mokutil -i "$der_file" -p 1234; done' >> "$LOG_FILE"
     enroll_nvidia_mok_returned=$?
     if [ $enroll_nvidia_mok_returned == 0 ]; then
         enable_validate_nvidia_autostart
