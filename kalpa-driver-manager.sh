@@ -13,8 +13,8 @@ NV_DRIVER_G00="G00" # No driver - denied
 NV_DRIVER_G04="G04" # No Wayland support - denied
 NV_DRIVER_G05="G05" # Limited Wayland support, known to break on Kernel updates - denied 
 NV_DRIVER_G06_CLOSED="G06-closed" # Fully supported
-NV_DRIVER_G06_OPEN="G06-open" # Fully supported
-NV_DRIVER_G07="G07" # Not yet in repos
+NV_DRIVER_G07="G06-open" # Fully supported
+NV_DRIVER_G07="G07" # Only works with open module
 
 NVIDIA_DRIVER_MODULES=("nvidia_drm" "nvidia_modeset" "nvidia_uvm")
 declare -A NVIDIA_SUPPORT_MATRIX=(
@@ -499,115 +499,114 @@ declare -A NVIDIA_SUPPORT_MATRIX=(
     ["0x10de:0x1dbe"]="$NV_DRIVER_G06_CLOSED" ["0x10de:0x1dc1"]="$NV_DRIVER_G06_CLOSED" ["0x10de:0x1df0"]="$NV_DRIVER_G06_CLOSED" ["0x10de:0x1df2"]="$NV_DRIVER_G06_CLOSED"
     ["0x10de:0x1df4"]="$NV_DRIVER_G06_CLOSED" ["0x10de:0x1df5"]="$NV_DRIVER_G06_CLOSED" ["0x10de:0x1df6"]="$NV_DRIVER_G06_CLOSED"
     # Turing
-    ["0x10de:0x1e02"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1e03"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1e04"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1e07"]="$NV_DRIVER_G06_OPEN"
-    ["0x1462:0x3715"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1e09"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1e2d"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1e2e"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x1e30"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x129e"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x12ba"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1e35"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x1e36"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1e37"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1304"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1347"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x1348"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1349"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1370"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x13a5"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x1e38"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1e3c"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1e3d"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1e3e"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x1e78"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x13d8"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x13d9"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1e81"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x1e82"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1e84"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1e87"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1e89"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x1e90"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1e91"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1e93"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1eab"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x1eae"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1eb0"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1eb1"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1eb4"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x1eb5"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1eb6"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1eb8"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1eb9"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x1eba"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1ebe"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1ec2"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1ec7"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x1ed0"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1ed1"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1ed3"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1ef5"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x1f02"]="$NV_DRIVER_G06_OPEN" ["0x1043:0x8673"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1f03"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1f04"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x1f06"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1f07"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1f08"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1f09"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x1f0a"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1f0b"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1f10"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1f11"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x1f12"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1f14"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1f15"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1f2e"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x1f36"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1f42"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1f47"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1f50"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x1f51"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1f54"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1f55"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1f76"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x2182"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2183"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2184"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2186"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x2187"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2188"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2189"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2191"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x2192"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x21ae"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x21bf"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x21c2"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x21c3"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x21c4"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x21d1"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1f81"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x1f82"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1f83"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1f91"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1f92"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x1f94"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1f95"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1f96"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1f97"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x1f98"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1f99"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1f9c"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1f9d"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x1f9f"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1fa0"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1fa1"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1fae"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x1fb0"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1fb1"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1fb2"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1fb6"]="$NV_DRIVER_G06_OPEN"
-    ["0x1028:0x0b10"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1fb7"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1fb8"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1fb9"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x1fba"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1fbb"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1fbc"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1fbf"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x1fd9"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1fdd"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1ff0"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1ff2"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x1ff9"]="$NV_DRIVER_G06_OPEN"
+    ["0x10de:0x1e02"]="$NV_DRIVER_G07" ["0x10de:0x1e03"]="$NV_DRIVER_G07" ["0x10de:0x1e04"]="$NV_DRIVER_G07" ["0x10de:0x1e07"]="$NV_DRIVER_G07"
+    ["0x1462:0x3715"]="$NV_DRIVER_G07" ["0x10de:0x1e09"]="$NV_DRIVER_G07" ["0x10de:0x1e2d"]="$NV_DRIVER_G07" ["0x10de:0x1e2e"]="$NV_DRIVER_G07"
+    ["0x10de:0x1e30"]="$NV_DRIVER_G07" ["0x10de:0x129e"]="$NV_DRIVER_G07" ["0x10de:0x12ba"]="$NV_DRIVER_G07" ["0x10de:0x1e35"]="$NV_DRIVER_G07"
+    ["0x10de:0x1e36"]="$NV_DRIVER_G07" ["0x10de:0x1e37"]="$NV_DRIVER_G07" ["0x10de:0x1304"]="$NV_DRIVER_G07" ["0x10de:0x1347"]="$NV_DRIVER_G07"
+    ["0x10de:0x1348"]="$NV_DRIVER_G07" ["0x10de:0x1349"]="$NV_DRIVER_G07" ["0x10de:0x1370"]="$NV_DRIVER_G07" ["0x10de:0x13a5"]="$NV_DRIVER_G07"
+    ["0x10de:0x1e38"]="$NV_DRIVER_G07" ["0x10de:0x1e3c"]="$NV_DRIVER_G07" ["0x10de:0x1e3d"]="$NV_DRIVER_G07" ["0x10de:0x1e3e"]="$NV_DRIVER_G07"
+    ["0x10de:0x1e78"]="$NV_DRIVER_G07" ["0x10de:0x13d8"]="$NV_DRIVER_G07" ["0x10de:0x13d9"]="$NV_DRIVER_G07" ["0x10de:0x1e81"]="$NV_DRIVER_G07"
+    ["0x10de:0x1e82"]="$NV_DRIVER_G07" ["0x10de:0x1e84"]="$NV_DRIVER_G07" ["0x10de:0x1e87"]="$NV_DRIVER_G07" ["0x10de:0x1e89"]="$NV_DRIVER_G07"
+    ["0x10de:0x1e90"]="$NV_DRIVER_G07" ["0x10de:0x1e91"]="$NV_DRIVER_G07" ["0x10de:0x1e93"]="$NV_DRIVER_G07" ["0x10de:0x1eab"]="$NV_DRIVER_G07"
+    ["0x10de:0x1eae"]="$NV_DRIVER_G07" ["0x10de:0x1eb0"]="$NV_DRIVER_G07" ["0x10de:0x1eb1"]="$NV_DRIVER_G07" ["0x10de:0x1eb4"]="$NV_DRIVER_G07"
+    ["0x10de:0x1eb5"]="$NV_DRIVER_G07" ["0x10de:0x1eb6"]="$NV_DRIVER_G07" ["0x10de:0x1eb8"]="$NV_DRIVER_G07" ["0x10de:0x1eb9"]="$NV_DRIVER_G07"
+    ["0x10de:0x1eba"]="$NV_DRIVER_G07" ["0x10de:0x1ebe"]="$NV_DRIVER_G07" ["0x10de:0x1ec2"]="$NV_DRIVER_G07" ["0x10de:0x1ec7"]="$NV_DRIVER_G07"
+    ["0x10de:0x1ed0"]="$NV_DRIVER_G07" ["0x10de:0x1ed1"]="$NV_DRIVER_G07" ["0x10de:0x1ed3"]="$NV_DRIVER_G07" ["0x10de:0x1ef5"]="$NV_DRIVER_G07"
+    ["0x10de:0x1f02"]="$NV_DRIVER_G07" ["0x1043:0x8673"]="$NV_DRIVER_G07" ["0x10de:0x1f03"]="$NV_DRIVER_G07" ["0x10de:0x1f04"]="$NV_DRIVER_G07"
+    ["0x10de:0x1f06"]="$NV_DRIVER_G07" ["0x10de:0x1f07"]="$NV_DRIVER_G07" ["0x10de:0x1f08"]="$NV_DRIVER_G07" ["0x10de:0x1f09"]="$NV_DRIVER_G07"
+    ["0x10de:0x1f0a"]="$NV_DRIVER_G07" ["0x10de:0x1f0b"]="$NV_DRIVER_G07" ["0x10de:0x1f10"]="$NV_DRIVER_G07" ["0x10de:0x1f11"]="$NV_DRIVER_G07"
+    ["0x10de:0x1f12"]="$NV_DRIVER_G07" ["0x10de:0x1f14"]="$NV_DRIVER_G07" ["0x10de:0x1f15"]="$NV_DRIVER_G07" ["0x10de:0x1f2e"]="$NV_DRIVER_G07"
+    ["0x10de:0x1f36"]="$NV_DRIVER_G07" ["0x10de:0x1f42"]="$NV_DRIVER_G07" ["0x10de:0x1f47"]="$NV_DRIVER_G07" ["0x10de:0x1f50"]="$NV_DRIVER_G07"
+    ["0x10de:0x1f51"]="$NV_DRIVER_G07" ["0x10de:0x1f54"]="$NV_DRIVER_G07" ["0x10de:0x1f55"]="$NV_DRIVER_G07" ["0x10de:0x1f76"]="$NV_DRIVER_G07"
+    ["0x10de:0x2182"]="$NV_DRIVER_G07" ["0x10de:0x2183"]="$NV_DRIVER_G07" ["0x10de:0x2184"]="$NV_DRIVER_G07" ["0x10de:0x2186"]="$NV_DRIVER_G07"
+    ["0x10de:0x2187"]="$NV_DRIVER_G07" ["0x10de:0x2188"]="$NV_DRIVER_G07" ["0x10de:0x2189"]="$NV_DRIVER_G07" ["0x10de:0x2191"]="$NV_DRIVER_G07"
+    ["0x10de:0x2192"]="$NV_DRIVER_G07" ["0x10de:0x21ae"]="$NV_DRIVER_G07" ["0x10de:0x21bf"]="$NV_DRIVER_G07" ["0x10de:0x21c2"]="$NV_DRIVER_G07"
+    ["0x10de:0x21c3"]="$NV_DRIVER_G07" ["0x10de:0x21c4"]="$NV_DRIVER_G07" ["0x10de:0x21d1"]="$NV_DRIVER_G07" ["0x10de:0x1f81"]="$NV_DRIVER_G07"
+    ["0x10de:0x1f82"]="$NV_DRIVER_G07" ["0x10de:0x1f83"]="$NV_DRIVER_G07" ["0x10de:0x1f91"]="$NV_DRIVER_G07" ["0x10de:0x1f92"]="$NV_DRIVER_G07"
+    ["0x10de:0x1f94"]="$NV_DRIVER_G07" ["0x10de:0x1f95"]="$NV_DRIVER_G07" ["0x10de:0x1f96"]="$NV_DRIVER_G07" ["0x10de:0x1f97"]="$NV_DRIVER_G07"
+    ["0x10de:0x1f98"]="$NV_DRIVER_G07" ["0x10de:0x1f99"]="$NV_DRIVER_G07" ["0x10de:0x1f9c"]="$NV_DRIVER_G07" ["0x10de:0x1f9d"]="$NV_DRIVER_G07"
+    ["0x10de:0x1f9f"]="$NV_DRIVER_G07" ["0x10de:0x1fa0"]="$NV_DRIVER_G07" ["0x10de:0x1fa1"]="$NV_DRIVER_G07" ["0x10de:0x1fae"]="$NV_DRIVER_G07"
+    ["0x10de:0x1fb0"]="$NV_DRIVER_G07" ["0x10de:0x1fb1"]="$NV_DRIVER_G07" ["0x10de:0x1fb2"]="$NV_DRIVER_G07" ["0x10de:0x1fb6"]="$NV_DRIVER_G07"
+    ["0x1028:0x0b10"]="$NV_DRIVER_G07" ["0x10de:0x1fb7"]="$NV_DRIVER_G07" ["0x10de:0x1fb8"]="$NV_DRIVER_G07" ["0x10de:0x1fb9"]="$NV_DRIVER_G07"
+    ["0x10de:0x1fba"]="$NV_DRIVER_G07" ["0x10de:0x1fbb"]="$NV_DRIVER_G07" ["0x10de:0x1fbc"]="$NV_DRIVER_G07" ["0x10de:0x1fbf"]="$NV_DRIVER_G07"
+    ["0x10de:0x1fd9"]="$NV_DRIVER_G07" ["0x10de:0x1fdd"]="$NV_DRIVER_G07" ["0x10de:0x1ff0"]="$NV_DRIVER_G07" ["0x10de:0x1ff2"]="$NV_DRIVER_G07"
+    ["0x10de:0x1ff9"]="$NV_DRIVER_G07"
     # Ampere
-    ["0x10de:0x2080"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2081"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2082"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x20b0"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x20b1"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x20b2"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x20b3"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x20b4"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x20b5"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x20b6"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x20b7"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x20b8"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x20b9"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x20bb"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x20bd"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x20be"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x20bf"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x20c0"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x20c2"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x20f0"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x20f1"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x20f2"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x20f3"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x20f5"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x20f6"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x20fd"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x20fe"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x20ff"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x2200"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2203"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2204"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x147d"]="$NV_DRIVER_G06_OPEN"
-    ["0x3842:0x3973"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2205"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2206"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x1467"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x146d"]="$NV_DRIVER_G06_OPEN" ["0x1462:0x3892"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2207"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2208"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x220a"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x220d"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2216"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x222b"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x222f"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2230"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2231"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2232"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x2233"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2235"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2236"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2237"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x2238"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x223f"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2414"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2420"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x2438"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2460"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2480"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2482"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x2483"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2484"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x146b"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x14ae"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x2486"]="$NV_DRIVER_G06_OPEN" ["0x19da:0x6630"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2487"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2488"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x2489"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x248a"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x248c"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x248d"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x248e"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x249c"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x249d"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x249f"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x24a0"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x24a4"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x24ac"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x24ad"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x24af"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x24b0"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x24b1"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x24b6"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x24b7"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x24b8"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x24b9"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x24ba"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x24bb"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x24bf"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x24c0"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x24c7"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x24c8"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x24c9"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x24dc"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x24dd"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x24df"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x24e0"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x24fa"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2501"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x2503"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2504"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2505"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2507"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x2508"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2509"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2520"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2521"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x2523"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x252f"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2531"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2544"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x2560"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2561"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2563"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2571"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x2582"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2583"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2584"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x25a0"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x25a2"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x25a3"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x25a4"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x25a5"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x25a6"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x25a7"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x25a9"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x25aa"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x25ab"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x25ac"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x25ad"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x25af"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x25b0"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x25b2"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x25b5"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x25b6"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x25b8"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x25b9"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x25ba"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x25bb"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x25bc"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x25bd"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x25e0"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x25e2"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x25e5"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x25ec"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x25ed"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x25f9"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x25fa"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x25fb"]="$NV_DRIVER_G06_OPEN"    
+    ["0x10de:0x2080"]="$NV_DRIVER_G07" ["0x10de:0x2081"]="$NV_DRIVER_G07" ["0x10de:0x2082"]="$NV_DRIVER_G07" ["0x10de:0x20b0"]="$NV_DRIVER_G07"
+    ["0x10de:0x20b1"]="$NV_DRIVER_G07" ["0x10de:0x20b2"]="$NV_DRIVER_G07" ["0x10de:0x20b3"]="$NV_DRIVER_G07" ["0x10de:0x20b4"]="$NV_DRIVER_G07"
+    ["0x10de:0x20b5"]="$NV_DRIVER_G07" ["0x10de:0x20b6"]="$NV_DRIVER_G07" ["0x10de:0x20b7"]="$NV_DRIVER_G07" ["0x10de:0x20b8"]="$NV_DRIVER_G07"
+    ["0x10de:0x20b9"]="$NV_DRIVER_G07" ["0x10de:0x20bb"]="$NV_DRIVER_G07" ["0x10de:0x20bd"]="$NV_DRIVER_G07" ["0x10de:0x20be"]="$NV_DRIVER_G07"
+    ["0x10de:0x20bf"]="$NV_DRIVER_G07" ["0x10de:0x20c0"]="$NV_DRIVER_G07" ["0x10de:0x20c2"]="$NV_DRIVER_G07" ["0x10de:0x20f0"]="$NV_DRIVER_G07"
+    ["0x10de:0x20f1"]="$NV_DRIVER_G07" ["0x10de:0x20f2"]="$NV_DRIVER_G07" ["0x10de:0x20f3"]="$NV_DRIVER_G07" ["0x10de:0x20f5"]="$NV_DRIVER_G07"
+    ["0x10de:0x20f6"]="$NV_DRIVER_G07" ["0x10de:0x20fd"]="$NV_DRIVER_G07" ["0x10de:0x20fe"]="$NV_DRIVER_G07" ["0x10de:0x20ff"]="$NV_DRIVER_G07"
+    ["0x10de:0x2200"]="$NV_DRIVER_G07" ["0x10de:0x2203"]="$NV_DRIVER_G07" ["0x10de:0x2204"]="$NV_DRIVER_G07" ["0x10de:0x147d"]="$NV_DRIVER_G07"
+    ["0x3842:0x3973"]="$NV_DRIVER_G07" ["0x10de:0x2205"]="$NV_DRIVER_G07" ["0x10de:0x2206"]="$NV_DRIVER_G07" ["0x10de:0x1467"]="$NV_DRIVER_G07"
+    ["0x10de:0x146d"]="$NV_DRIVER_G07" ["0x1462:0x3892"]="$NV_DRIVER_G07" ["0x10de:0x2207"]="$NV_DRIVER_G07" ["0x10de:0x2208"]="$NV_DRIVER_G07"
+    ["0x10de:0x220a"]="$NV_DRIVER_G07" ["0x10de:0x220d"]="$NV_DRIVER_G07" ["0x10de:0x2216"]="$NV_DRIVER_G07" ["0x10de:0x222b"]="$NV_DRIVER_G07"
+    ["0x10de:0x222f"]="$NV_DRIVER_G07" ["0x10de:0x2230"]="$NV_DRIVER_G07" ["0x10de:0x2231"]="$NV_DRIVER_G07" ["0x10de:0x2232"]="$NV_DRIVER_G07"
+    ["0x10de:0x2233"]="$NV_DRIVER_G07" ["0x10de:0x2235"]="$NV_DRIVER_G07" ["0x10de:0x2236"]="$NV_DRIVER_G07" ["0x10de:0x2237"]="$NV_DRIVER_G07"
+    ["0x10de:0x2238"]="$NV_DRIVER_G07" ["0x10de:0x223f"]="$NV_DRIVER_G07" ["0x10de:0x2414"]="$NV_DRIVER_G07" ["0x10de:0x2420"]="$NV_DRIVER_G07"
+    ["0x10de:0x2438"]="$NV_DRIVER_G07" ["0x10de:0x2460"]="$NV_DRIVER_G07" ["0x10de:0x2480"]="$NV_DRIVER_G07" ["0x10de:0x2482"]="$NV_DRIVER_G07"
+    ["0x10de:0x2483"]="$NV_DRIVER_G07" ["0x10de:0x2484"]="$NV_DRIVER_G07" ["0x10de:0x146b"]="$NV_DRIVER_G07" ["0x10de:0x14ae"]="$NV_DRIVER_G07"
+    ["0x10de:0x2486"]="$NV_DRIVER_G07" ["0x19da:0x6630"]="$NV_DRIVER_G07" ["0x10de:0x2487"]="$NV_DRIVER_G07" ["0x10de:0x2488"]="$NV_DRIVER_G07"
+    ["0x10de:0x2489"]="$NV_DRIVER_G07" ["0x10de:0x248a"]="$NV_DRIVER_G07" ["0x10de:0x248c"]="$NV_DRIVER_G07" ["0x10de:0x248d"]="$NV_DRIVER_G07"
+    ["0x10de:0x248e"]="$NV_DRIVER_G07" ["0x10de:0x249c"]="$NV_DRIVER_G07" ["0x10de:0x249d"]="$NV_DRIVER_G07" ["0x10de:0x249f"]="$NV_DRIVER_G07"
+    ["0x10de:0x24a0"]="$NV_DRIVER_G07" ["0x10de:0x24a4"]="$NV_DRIVER_G07" ["0x10de:0x24ac"]="$NV_DRIVER_G07" ["0x10de:0x24ad"]="$NV_DRIVER_G07"
+    ["0x10de:0x24af"]="$NV_DRIVER_G07" ["0x10de:0x24b0"]="$NV_DRIVER_G07" ["0x10de:0x24b1"]="$NV_DRIVER_G07" ["0x10de:0x24b6"]="$NV_DRIVER_G07"
+    ["0x10de:0x24b7"]="$NV_DRIVER_G07" ["0x10de:0x24b8"]="$NV_DRIVER_G07" ["0x10de:0x24b9"]="$NV_DRIVER_G07" ["0x10de:0x24ba"]="$NV_DRIVER_G07"
+    ["0x10de:0x24bb"]="$NV_DRIVER_G07" ["0x10de:0x24bf"]="$NV_DRIVER_G07" ["0x10de:0x24c0"]="$NV_DRIVER_G07" ["0x10de:0x24c7"]="$NV_DRIVER_G07"
+    ["0x10de:0x24c8"]="$NV_DRIVER_G07" ["0x10de:0x24c9"]="$NV_DRIVER_G07" ["0x10de:0x24dc"]="$NV_DRIVER_G07" ["0x10de:0x24dd"]="$NV_DRIVER_G07"
+    ["0x10de:0x24df"]="$NV_DRIVER_G07" ["0x10de:0x24e0"]="$NV_DRIVER_G07" ["0x10de:0x24fa"]="$NV_DRIVER_G07" ["0x10de:0x2501"]="$NV_DRIVER_G07"
+    ["0x10de:0x2503"]="$NV_DRIVER_G07" ["0x10de:0x2504"]="$NV_DRIVER_G07" ["0x10de:0x2505"]="$NV_DRIVER_G07" ["0x10de:0x2507"]="$NV_DRIVER_G07"
+    ["0x10de:0x2508"]="$NV_DRIVER_G07" ["0x10de:0x2509"]="$NV_DRIVER_G07" ["0x10de:0x2520"]="$NV_DRIVER_G07" ["0x10de:0x2521"]="$NV_DRIVER_G07"
+    ["0x10de:0x2523"]="$NV_DRIVER_G07" ["0x10de:0x252f"]="$NV_DRIVER_G07" ["0x10de:0x2531"]="$NV_DRIVER_G07" ["0x10de:0x2544"]="$NV_DRIVER_G07"
+    ["0x10de:0x2560"]="$NV_DRIVER_G07" ["0x10de:0x2561"]="$NV_DRIVER_G07" ["0x10de:0x2563"]="$NV_DRIVER_G07" ["0x10de:0x2571"]="$NV_DRIVER_G07"
+    ["0x10de:0x2582"]="$NV_DRIVER_G07" ["0x10de:0x2583"]="$NV_DRIVER_G07" ["0x10de:0x2584"]="$NV_DRIVER_G07" ["0x10de:0x25a0"]="$NV_DRIVER_G07"
+    ["0x10de:0x25a2"]="$NV_DRIVER_G07" ["0x10de:0x25a3"]="$NV_DRIVER_G07" ["0x10de:0x25a4"]="$NV_DRIVER_G07" ["0x10de:0x25a5"]="$NV_DRIVER_G07"
+    ["0x10de:0x25a6"]="$NV_DRIVER_G07" ["0x10de:0x25a7"]="$NV_DRIVER_G07" ["0x10de:0x25a9"]="$NV_DRIVER_G07" ["0x10de:0x25aa"]="$NV_DRIVER_G07"
+    ["0x10de:0x25ab"]="$NV_DRIVER_G07" ["0x10de:0x25ac"]="$NV_DRIVER_G07" ["0x10de:0x25ad"]="$NV_DRIVER_G07" ["0x10de:0x25af"]="$NV_DRIVER_G07"
+    ["0x10de:0x25b0"]="$NV_DRIVER_G07" ["0x10de:0x25b2"]="$NV_DRIVER_G07" ["0x10de:0x25b5"]="$NV_DRIVER_G07" ["0x10de:0x25b6"]="$NV_DRIVER_G07"
+    ["0x10de:0x25b8"]="$NV_DRIVER_G07" ["0x10de:0x25b9"]="$NV_DRIVER_G07" ["0x10de:0x25ba"]="$NV_DRIVER_G07" ["0x10de:0x25bb"]="$NV_DRIVER_G07"
+    ["0x10de:0x25bc"]="$NV_DRIVER_G07" ["0x10de:0x25bd"]="$NV_DRIVER_G07" ["0x10de:0x25e0"]="$NV_DRIVER_G07" ["0x10de:0x25e2"]="$NV_DRIVER_G07"
+    ["0x10de:0x25e5"]="$NV_DRIVER_G07" ["0x10de:0x25ec"]="$NV_DRIVER_G07" ["0x10de:0x25ed"]="$NV_DRIVER_G07" ["0x10de:0x25f9"]="$NV_DRIVER_G07"
+    ["0x10de:0x25fa"]="$NV_DRIVER_G07" ["0x10de:0x25fb"]="$NV_DRIVER_G07"    
     # Ada Lovelace
-    ["0x10de:0x2681"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2684"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2685"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2689"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x26af"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x26b1"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x26b2"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x26b3"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x26b5"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x26b7"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x26b8"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x26b9"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x26ba"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x26bb"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x26f5"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2702"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x2703"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2704"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2705"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2709"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x2717"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2730"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2757"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2770"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x2782"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2783"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2785"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2786"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x2788"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x27a0"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x27b0"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x27b1"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x27b2"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x27b6"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x27b7"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x27b8"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x27ba"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x27bb"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x27e0"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x27fa"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x27fb"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2803"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2805"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2808"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x2820"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2822"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2838"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2860"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x2878"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2882"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x28a0"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x28a1"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x28a3"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x28b0"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x28b8"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x28b9"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x28ba"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x28bb"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x28e0"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x28e1"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x28e3"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x28f8"]="$NV_DRIVER_G06_OPEN"
+    ["0x10de:0x2681"]="$NV_DRIVER_G07" ["0x10de:0x2684"]="$NV_DRIVER_G07" ["0x10de:0x2685"]="$NV_DRIVER_G07" ["0x10de:0x2689"]="$NV_DRIVER_G07"
+    ["0x10de:0x26af"]="$NV_DRIVER_G07" ["0x10de:0x26b1"]="$NV_DRIVER_G07" ["0x10de:0x26b2"]="$NV_DRIVER_G07" ["0x10de:0x26b3"]="$NV_DRIVER_G07"
+    ["0x10de:0x26b5"]="$NV_DRIVER_G07" ["0x10de:0x26b7"]="$NV_DRIVER_G07" ["0x10de:0x26b8"]="$NV_DRIVER_G07" ["0x10de:0x26b9"]="$NV_DRIVER_G07"
+    ["0x10de:0x26ba"]="$NV_DRIVER_G07" ["0x10de:0x26bb"]="$NV_DRIVER_G07" ["0x10de:0x26f5"]="$NV_DRIVER_G07" ["0x10de:0x2702"]="$NV_DRIVER_G07"
+    ["0x10de:0x2703"]="$NV_DRIVER_G07" ["0x10de:0x2704"]="$NV_DRIVER_G07" ["0x10de:0x2705"]="$NV_DRIVER_G07" ["0x10de:0x2709"]="$NV_DRIVER_G07"
+    ["0x10de:0x2717"]="$NV_DRIVER_G07" ["0x10de:0x2730"]="$NV_DRIVER_G07" ["0x10de:0x2757"]="$NV_DRIVER_G07" ["0x10de:0x2770"]="$NV_DRIVER_G07"
+    ["0x10de:0x2782"]="$NV_DRIVER_G07" ["0x10de:0x2783"]="$NV_DRIVER_G07" ["0x10de:0x2785"]="$NV_DRIVER_G07" ["0x10de:0x2786"]="$NV_DRIVER_G07"
+    ["0x10de:0x2788"]="$NV_DRIVER_G07" ["0x10de:0x27a0"]="$NV_DRIVER_G07" ["0x10de:0x27b0"]="$NV_DRIVER_G07" ["0x10de:0x27b1"]="$NV_DRIVER_G07"
+    ["0x10de:0x27b2"]="$NV_DRIVER_G07" ["0x10de:0x27b6"]="$NV_DRIVER_G07" ["0x10de:0x27b7"]="$NV_DRIVER_G07" ["0x10de:0x27b8"]="$NV_DRIVER_G07"
+    ["0x10de:0x27ba"]="$NV_DRIVER_G07" ["0x10de:0x27bb"]="$NV_DRIVER_G07" ["0x10de:0x27e0"]="$NV_DRIVER_G07" ["0x10de:0x27fa"]="$NV_DRIVER_G07"
+    ["0x10de:0x27fb"]="$NV_DRIVER_G07" ["0x10de:0x2803"]="$NV_DRIVER_G07" ["0x10de:0x2805"]="$NV_DRIVER_G07" ["0x10de:0x2808"]="$NV_DRIVER_G07"
+    ["0x10de:0x2820"]="$NV_DRIVER_G07" ["0x10de:0x2822"]="$NV_DRIVER_G07" ["0x10de:0x2838"]="$NV_DRIVER_G07" ["0x10de:0x2860"]="$NV_DRIVER_G07"
+    ["0x10de:0x2878"]="$NV_DRIVER_G07" ["0x10de:0x2882"]="$NV_DRIVER_G07" ["0x10de:0x28a0"]="$NV_DRIVER_G07" ["0x10de:0x28a1"]="$NV_DRIVER_G07"
+    ["0x10de:0x28a3"]="$NV_DRIVER_G07" ["0x10de:0x28b0"]="$NV_DRIVER_G07" ["0x10de:0x28b8"]="$NV_DRIVER_G07" ["0x10de:0x28b9"]="$NV_DRIVER_G07"
+    ["0x10de:0x28ba"]="$NV_DRIVER_G07" ["0x10de:0x28bb"]="$NV_DRIVER_G07" ["0x10de:0x28e0"]="$NV_DRIVER_G07" ["0x10de:0x28e1"]="$NV_DRIVER_G07"
+    ["0x10de:0x28e3"]="$NV_DRIVER_G07" ["0x10de:0x28f8"]="$NV_DRIVER_G07"
     # Blackwell
-    ["0x10de:0x2900"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2901"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2920"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2924"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x2925"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x293d"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2940"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2941"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x297e"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2980"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x29bb"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x29bc"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x29c0"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x29f1"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2b00"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2b85"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x2b87"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2b8c"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2bb1"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2bb2"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x2bb3"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2bb4"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2bb5"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2bb9"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x2bbc"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2c02"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2c05"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2c18"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x2c19"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2c2c"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2c31"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2c33"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x2c34"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2c38"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2c39"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2c3a"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x2c58"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2c59"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2c77"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2c79"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x2d04"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2d05"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2d18"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2d19"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x2d2c"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2d30"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2d39"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2d58"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x2d59"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2d79"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2d83"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2d98"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x2db8"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2db9"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2dd8"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2df9"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x2e12"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2e2a"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2f04"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2f18"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x2f38"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2f58"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x2f80"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x3180"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x3182"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x31a1"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x31c0"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x31c2"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x31fe"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x3200"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x3224"]="$NV_DRIVER_G06_OPEN" ["0x10de:0x323e"]="$NV_DRIVER_G06_OPEN"
-    ["0x10de:0x3340"]="$NV_DRIVER_G06_OPEN"
-    # G07 - not yet in repos, if so all G06-open will go there
+    ["0x10de:0x2900"]="$NV_DRIVER_G07" ["0x10de:0x2901"]="$NV_DRIVER_G07" ["0x10de:0x2920"]="$NV_DRIVER_G07" ["0x10de:0x2924"]="$NV_DRIVER_G07"
+    ["0x10de:0x2925"]="$NV_DRIVER_G07" ["0x10de:0x293d"]="$NV_DRIVER_G07" ["0x10de:0x2940"]="$NV_DRIVER_G07" ["0x10de:0x2941"]="$NV_DRIVER_G07"
+    ["0x10de:0x297e"]="$NV_DRIVER_G07" ["0x10de:0x2980"]="$NV_DRIVER_G07" ["0x10de:0x29bb"]="$NV_DRIVER_G07" ["0x10de:0x29bc"]="$NV_DRIVER_G07"
+    ["0x10de:0x29c0"]="$NV_DRIVER_G07" ["0x10de:0x29f1"]="$NV_DRIVER_G07" ["0x10de:0x2b00"]="$NV_DRIVER_G07" ["0x10de:0x2b85"]="$NV_DRIVER_G07"
+    ["0x10de:0x2b87"]="$NV_DRIVER_G07" ["0x10de:0x2b8c"]="$NV_DRIVER_G07" ["0x10de:0x2bb1"]="$NV_DRIVER_G07" ["0x10de:0x2bb2"]="$NV_DRIVER_G07"
+    ["0x10de:0x2bb3"]="$NV_DRIVER_G07" ["0x10de:0x2bb4"]="$NV_DRIVER_G07" ["0x10de:0x2bb5"]="$NV_DRIVER_G07" ["0x10de:0x2bb9"]="$NV_DRIVER_G07"
+    ["0x10de:0x2bbc"]="$NV_DRIVER_G07" ["0x10de:0x2c02"]="$NV_DRIVER_G07" ["0x10de:0x2c05"]="$NV_DRIVER_G07" ["0x10de:0x2c18"]="$NV_DRIVER_G07"
+    ["0x10de:0x2c19"]="$NV_DRIVER_G07" ["0x10de:0x2c2c"]="$NV_DRIVER_G07" ["0x10de:0x2c31"]="$NV_DRIVER_G07" ["0x10de:0x2c33"]="$NV_DRIVER_G07"
+    ["0x10de:0x2c34"]="$NV_DRIVER_G07" ["0x10de:0x2c38"]="$NV_DRIVER_G07" ["0x10de:0x2c39"]="$NV_DRIVER_G07" ["0x10de:0x2c3a"]="$NV_DRIVER_G07"
+    ["0x10de:0x2c58"]="$NV_DRIVER_G07" ["0x10de:0x2c59"]="$NV_DRIVER_G07" ["0x10de:0x2c77"]="$NV_DRIVER_G07" ["0x10de:0x2c79"]="$NV_DRIVER_G07"
+    ["0x10de:0x2d04"]="$NV_DRIVER_G07" ["0x10de:0x2d05"]="$NV_DRIVER_G07" ["0x10de:0x2d18"]="$NV_DRIVER_G07" ["0x10de:0x2d19"]="$NV_DRIVER_G07"
+    ["0x10de:0x2d2c"]="$NV_DRIVER_G07" ["0x10de:0x2d30"]="$NV_DRIVER_G07" ["0x10de:0x2d39"]="$NV_DRIVER_G07" ["0x10de:0x2d58"]="$NV_DRIVER_G07"
+    ["0x10de:0x2d59"]="$NV_DRIVER_G07" ["0x10de:0x2d79"]="$NV_DRIVER_G07" ["0x10de:0x2d83"]="$NV_DRIVER_G07" ["0x10de:0x2d98"]="$NV_DRIVER_G07"
+    ["0x10de:0x2db8"]="$NV_DRIVER_G07" ["0x10de:0x2db9"]="$NV_DRIVER_G07" ["0x10de:0x2dd8"]="$NV_DRIVER_G07" ["0x10de:0x2df9"]="$NV_DRIVER_G07"
+    ["0x10de:0x2e12"]="$NV_DRIVER_G07" ["0x10de:0x2e2a"]="$NV_DRIVER_G07" ["0x10de:0x2f04"]="$NV_DRIVER_G07" ["0x10de:0x2f18"]="$NV_DRIVER_G07"
+    ["0x10de:0x2f38"]="$NV_DRIVER_G07" ["0x10de:0x2f58"]="$NV_DRIVER_G07" ["0x10de:0x2f80"]="$NV_DRIVER_G07" ["0x10de:0x3180"]="$NV_DRIVER_G07"
+    ["0x10de:0x3182"]="$NV_DRIVER_G07" ["0x10de:0x31a1"]="$NV_DRIVER_G07" ["0x10de:0x31c0"]="$NV_DRIVER_G07" ["0x10de:0x31c2"]="$NV_DRIVER_G07"
+    ["0x10de:0x31fe"]="$NV_DRIVER_G07" ["0x10de:0x3200"]="$NV_DRIVER_G07" ["0x10de:0x3224"]="$NV_DRIVER_G07" ["0x10de:0x323e"]="$NV_DRIVER_G07"
+    ["0x10de:0x3340"]="$NV_DRIVER_G07"
 )
 
 supported_driver_series_nv="none"
@@ -795,6 +794,13 @@ user_consent(){
     fi
 }
 
+_run_only_in_tu_setup_g07(){
+    sed -i 's/# autoAgreeWithLicenses = no/autoAgreeWithLicenses = yes/' /etc/zypp/zypper.conf
+    zypper -n --gpg-auto-import-keys in --auto-agree-with-licenses openSUSE-repos-MicroOS-NVIDIA
+    zypper -n --gpg-auto-import-keys in --auto-agree-with-licenses nvidia-open-driver-G07-signed-kmp-meta nvidia-userspace-meta-G07
+    return $?
+}
+
 _run_only_in_tu_setup_g06_open_driver(){
     sed -i 's/# autoAgreeWithLicenses = no/autoAgreeWithLicenses = yes/' /etc/zypp/zypper.conf
     zypper -n --gpg-auto-import-keys in --auto-agree-with-licenses openSUSE-repos-MicroOS-NVIDIA
@@ -827,6 +833,10 @@ do_install_nvidia_drivers(){
             ;;
             "$NV_DRIVER_G06_OPEN")
                 kdesu -t -c "transactional-update run kalpa-driver-manager --install-G06-open && transactional-update -c initrd" >> "$LOG_FILE"
+                install_returned=$?
+            ;;
+            "$NV_DRIVER_G07")
+                kdesu -t -c "transactional-update run kalpa-driver-manager --install-G07 && transactional-update -c initrd" >> "$LOG_FILE"
                 install_returned=$?
             ;;
         esac
@@ -884,6 +894,14 @@ read_commandline(){
                     exit 1
                 fi
             ;;
+            --install-G07*)
+                _run_only_in_tu_setup_g07
+                if [ $? == 0 ]; then
+                    exit 0
+                else
+                    exit 1
+                fi
+            ;;
             --validate-nv*)
                 analyze_system
                 if detect_nvidia_driver_running; then
@@ -905,6 +923,7 @@ read_commandline(){
                 echo "  --validate-nv           Validates whether the nvidia driver modules have been loaded or not. Useful to check if the installation of the driver was actually successful"
                 echo "  --install-G06-open      Install the G06 driver using the open source module. It is mandatory to run this cli option with transactional-update otherwise it will fail."
                 echo "  --install-G06-closed    Install the G06 driver using the closed source module. It is mandatory to run this cli option with transactional-update otherwise it will fail."
+                echo "  --install-G07           Install the G07 driver. It is mandatory to run this cli option with transactional-update otherwise it will fail."
                 echo "  -v | --version          Prints current version"
                 echo "  -h | --help             Prints this message"
                 echo ""
