@@ -625,7 +625,7 @@ is_distro_supported=false
 
 
 askpass_run() {
-  SUDO_ASKPASS=/usr/bin/ksshaskpass6 sudo -A /bin/sh -lc "$1"
+  SUDO_ASKPASS=/usr/bin/ksshaskpass sudo -A /bin/sh -lc "$1"
 }
 
 enable_mok_autostart(){
