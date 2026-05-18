@@ -609,11 +609,13 @@ declare -A NVIDIA_SUPPORT_MATRIX=(
     ["0x10de:0x3340"]="$NV_DRIVER_G07"
 )
 
+ASK_PASS_RUN="SUDO_ASKPASS=/usr/bin/ksshaskpass sudo -A /usr/bin/sh -lc"
+
 supported_driver_series_nv="none"
 found_device_nv="none"
 user_agreed_to_license_nv=false
 
-required_binaries=("kdesu" "kdialog" "qdbus6" "/usr/sbin/transactional-update" "sed")
+required_binaries=("ksshaskpass" "kdialog" "qdbus6" "/usr/sbin/transactional-update" "sed")
 missing_binaries=()
 
 is_system_ready_for_nvidia=false
@@ -645,7 +647,7 @@ clear_validate_nvidia_autostart(){
 }
 
 enroll_nvidia_mok(){
-    kdesu -t -c "for der_file in /usr/share/nvidia-pubkeys/*; do if [[ -f \"\$der_file\" ]]; then echo \"Enrolling: \${der_file}\" && mokutil -i \"\$der_file\" -p 1234 ; fi ; done" >> "$LOG_FILE"
+    $ASK_PASS_RUN "for der_file in /usr/share/nvidia-pubkeys/*; do if [[ -f \"\$der_file\" ]]; then echo \"Enrolling: \${der_file}\" && mokutil -i \"\$der_file\" -p 1234 ; fi ; done" >> "$LOG_FILE"
     enroll_nvidia_mok_returned=$?
     if [ $enroll_nvidia_mok_returned == 0 ]; then
         enable_validate_nvidia_autostart
@@ -828,15 +830,15 @@ do_install_nvidia_drivers(){
         case $supported_driver_series_nv in
             "$NV_DRIVER_G06_CLOSED")
                 qdbus6 $dbusRef setLabelText "Installing NVIDIA driver, this will take some time..."
-                kdesu -t -c "transactional-update run kalpa-driver-manager --install-G06-closed && transactional-update -c initrd" >> "$LOG_FILE"
+                $ASK_PASS_RUN "transactional-update run kalpa-driver-manager --install-G06-closed && transactional-update -c initrd" >> "$LOG_FILE"
                 install_returned=$?
             ;;
             "$NV_DRIVER_G06_OPEN")
-                kdesu -t -c "transactional-update run kalpa-driver-manager --install-G06-open && transactional-update -c initrd" >> "$LOG_FILE"
+                $ASK_PASS_RUN "transactional-update run kalpa-driver-manager --install-G06-open && transactional-update -c initrd" >> "$LOG_FILE"
                 install_returned=$?
             ;;
             "$NV_DRIVER_G07")
-                kdesu -t -c "transactional-update run kalpa-driver-manager --install-G07 && transactional-update -c initrd" >> "$LOG_FILE"
+                $ASK_PASS_RUN "transactional-update run kalpa-driver-manager --install-G07 && transactional-update -c initrd" >> "$LOG_FILE"
                 install_returned=$?
             ;;
         esac
