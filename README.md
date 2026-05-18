@@ -1,7 +1,7 @@
 # Kalpa Driver Manager
 KDialog based shell utility to install proprietary devices drivers on Kalpa Desktop.
 
-[![build result](https://build.opensuse.org/projects/home:VortexAcherontic/packages/kalpa-driver-manager/badge.svg?type=default)](https://build.opensuse.org/package/show/home:VortexAcherontic/kalpa-driver-manager)
+[![build result](https://build.opensuse.org/projects/devel:microos:kalpa/packages/kalpa-driver-manager/badge.svg?type=default)](https://build.opensuse.org/package/show/devel:microos:kalpa/kalpa-driver-manager)
 
 ## Note
 While this script worked in my own tests it is not guaranteed to work for everyone. If you want to use it feel free to do so on your own risk. Please report any issues you may find.
