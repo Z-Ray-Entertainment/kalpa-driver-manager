@@ -628,16 +628,6 @@ askpass_run() {
   SUDO_ASKPASS=/usr/bin/ksshaskpass sudo -A /bin/bash -lc "$1"
 }
 
-enable_mok_autostart(){
-    echo -e "[Desktop Entry]\nExec=/usr/bin/kalpa-driver-manager --mok\nType=Application" > "$AUTOSTART_FILE"
-}
-
-clear_mok_autostart(){
-    if [[ -f "$AUTOSTART_FILE" ]]; then
-        rm -f "$AUTOSTART_FILE"
-    fi
-}
-
 enable_validate_nvidia_autostart(){
         echo -e "[Desktop Entry]\nExec=/usr/bin/kalpa-driver-manager --validate-nv\nType=Application" > "$AUTOSTART_VALIDATE_NVIDIA_FILE"
 }
@@ -645,15 +635,6 @@ enable_validate_nvidia_autostart(){
 clear_validate_nvidia_autostart(){
     if [[ -f "$AUTOSTART_VALIDATE_NVIDIA_FILE" ]]; then
         rm -f "$AUTOSTART_VALIDATE_NVIDIA_FILE"
-    fi
-}
-
-enroll_nvidia_mok(){
-    askpass_run 'for der_file in /usr/share/nvidia-pubkeys/*; do if [[ -f "$der_file" ]]; then echo "Enrolling: ${der_file}" && mokutil -i "$der_file" -p 1234 ; fi ; done' >> "$LOG_FILE"
-    enroll_nvidia_mok_returned=$?
-    if [ $enroll_nvidia_mok_returned == 0 ]; then
-        enable_validate_nvidia_autostart
-        kdialog --title "$TITLE" --msgbox "MOKs have been enrolled. After restarting your computer the UEFI will show a dialog called 'Perform MOK management'. In here please choose 'Enroll MOK' -> 'Continue' -> 'Yes' and enter '1234' as password. Afterwards the NVIDIA driver should be loaded.\n\nAttention: After every NVIDIA driver update you have to repeated this process. Simply launch 'kalpa-driver-manager --mok', or right-click the Kalpa Driver Manager in start menu and choose MOK management, to run though this dialog again."
     fi
 }
 
@@ -755,6 +736,10 @@ verify_ready_for_driver(){
                 exit 1
             ;;
         esac
+        if [ $is_secure_boot_enabled = true ] && [ $supported_driver_series_nv == "$NV_DRIVER_G06_CLOSED" ]; then
+            kdialog --title="$TITLE" --sorry "System configuration is not supported. We've detected a supported NVIDIA GPU which requires the closed source driver module. We do not recommend using SecureBoot with this driver series. Turn off SecureBoot and run kalpa-driver-manager again."
+            exit 1
+        fi
     fi
 }
 
@@ -850,13 +835,8 @@ do_install_nvidia_drivers(){
         qdbus6 $dbusRef close
 
         if [ $install_returned == 0 ]; then
-            if [ $is_secure_boot_enabled = true ] && [ $supported_driver_series_nv == "$NV_DRIVER_G06_CLOSED" ]; then
-                enable_mok_autostart
-                kdialog --title="$TITLE" --msgbox "Driver installation successful. However we detected SecureBoot is enabled while also installing the closed source NVIDIA Kernel module. In order for the driver to actual function we have to enroll the required SecureBoot signing keys for the driver. After rebooting $TITLE will open up and guide you through the process. Please be aware the next boot will be very unpleasant with low resolution display as the desktop will be rendered entirely on your CPU."
-            else
-                enable_validate_nvidia_autostart
-                kdialog --title="$TITLE" --msgbox "Installation successful, please reboot your computer any time for the driver to load up."
-            fi
+            enable_validate_nvidia_autostart
+            kdialog --title="$TITLE" --msgbox "Installation successful, please reboot your computer any time for the driver to load up."
         else
             kdialog --title="$TITLE" --sorry "There seemed to be an error during the driver installation. Please submit this error to Kalpa Desktop and attache this log file to the report $LOG_FILE"
         fi
@@ -866,22 +846,6 @@ do_install_nvidia_drivers(){
 read_commandline(){
     for i in "$@"; do
         case $i in
-            -m*|--mok*)
-            analyze_system
-            verify_system
-            if [ $is_secure_boot_enabled = true ]; then
-                if [ $supported_driver_series_nv == "$NV_DRIVER_G06_CLOSED" ]; then
-                    if kdialog --title "$TITLE" --yesno "Welcome to the MOK enroll assistant. By continuing we will modify your systems SecureBoot setup by adding the NVIDIA provided signing Key to the UEFI keystore. Do you wish to continue?"; then
-                        enroll_nvidia_mok
-                    fi
-                else
-                    kdialog --title "$TITLE" --msgbox "Enrolling signing keys is not required on this system. Your GPU is supported by the open source NVIDIA kernel module which do not require the enrollment of singing keys."
-                fi
-            else
-                kdialog --title "$TITLE" --msgbox "Enrolling signing keys is not required on this system. SecureBoot is disabled"
-            fi
-            clear_mok_autostart
-            ;;
             --install-G06-open*)
                 _run_only_in_tu_setup_g06_open_driver
                 if [ $? == 0 ]; then
@@ -923,7 +887,6 @@ read_commandline(){
                 echo "Version: $VERSION"
                 echo ""
                 echo "Options:"
-                echo "  -m | --mok              Enrolls machine owner keys (MOK) for SecureBoot enabled systems requiring closed source proprietary kernel modules shipping their own singing keys"
                 echo "  --validate-nv           Validates whether the nvidia driver modules have been loaded or not. Useful to check if the installation of the driver was actually successful"
                 echo "  --install-G06-open      Install the G06 driver using the open source module. It is mandatory to run this cli option with transactional-update otherwise it will fail."
                 echo "  --install-G06-closed    Install the G06 driver using the closed source module. It is mandatory to run this cli option with transactional-update otherwise it will fail."
