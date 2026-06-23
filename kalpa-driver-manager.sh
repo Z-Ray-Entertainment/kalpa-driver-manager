@@ -13,7 +13,7 @@ NV_DRIVER_G00="G00" # No driver - denied
 NV_DRIVER_G04="G04" # No Wayland support - denied
 NV_DRIVER_G05="G05" # Limited Wayland support, known to break on Kernel updates - denied 
 NV_DRIVER_G06_CLOSED="G06-closed" # Fully supported
-NV_DRIVER_G07="G06-open" # Fully supported
+NV_DRIVER_G06_OPEN="G06-open" # Fully supported
 NV_DRIVER_G07="G07" # Only works with open module
 
 NVIDIA_DRIVER_MODULES=("nvidia_drm" "nvidia_modeset" "nvidia_uvm")
